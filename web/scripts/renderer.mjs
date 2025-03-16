@@ -11,7 +11,9 @@ export class Renderer {
     constructor(cvs) {
         this.cvs = cvs;
         this.gl = notNull(
-            cvs.getContext("webgl2"), 
+            cvs.getContext("webgl2", {
+                premultipliedAlpha: false // Use alpha
+            }), 
             "Your browser doesn't support the Webgl2 API"
         );
 
