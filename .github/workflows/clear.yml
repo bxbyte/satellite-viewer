@@ -1,0 +1,24 @@
+# Keep only one workflow run by day for a month
+name: Clear old workflow runs
+
+on:
+  # Automatically run every day
+  schedule:
+    - cron: '0 0 * * *'
+  # Manually run from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  clear-runs:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 1
+          keep_minimum_runs: 1
