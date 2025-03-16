@@ -22,7 +22,7 @@ export function sphere({lon = 100, lat = 100, layer = 1} = {}) {
     return c.map(c => {
         const r = (c[2] + 1) / shape[2],
             x = c[0] / shape[0] * Math.PI * 2,
-            y = c[1] / shape[1] * Math.PI * 2,
+            y = c[1] / (shape[1] - 1) * Math.PI,
             sy = Math.sin(y)
 
         return { 
