@@ -1,8 +1,8 @@
 import { notNull } from "./utils.mjs"
 import { Renderer } from "./canvas/renderer.mjs"
 import { M4x4 } from "./canvas/matrix.mjs"
-import { sphere } from "./canvas/shape.mjs"
 import { computeOrbit } from "./tle.mjs"
+import { getTLE } from "./api.mjs"
 
 document.addEventListener("DOMContentLoaded", async () => {
     const r = new Renderer(
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const res = await fetch(new URL(f, import.meta.url))
         return await res.text()
     }))))
-    
+
     shader.use()
 
     let projMatrix = M4x4.projection(40, r.cvs.width / r.cvs.height, 0, 100)
@@ -34,21 +34,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const timeLocation = shader.getUniform("time")
 
-    const orbits = [ 
-        `ISS (ZARYA)
-        1 25544U 98067A   24075.54947917  .0016717  00000+0  30250-3 0  9991
-        2 25544  51.6423  98.2213 0004811  93.2234  61.5552 15.49661612394797`,
-        `AISSAT 2
-        1 40075U 14037G   23362.49933056 .00003465  00000+0  40707-3 0  9994
-        2 40075  98.3401 268.4723 0004780 335.0232  25.0749 14.85601820512563`,
-        `NORSAT 3
-        1 48272U 21034E 23362.43828188 .00004841 00000+0 48553-3 0 9995
-        2 48272 97.6838 64.9893 0002115 110.5617 249.5829 14.91778587 144752`
-     ].map(computeOrbit)
+    const orbits = await getTLE()
 
-    console.log(orbits)
-    
-    /** @constant */
     const schema = [
         'eccentricity',
         'semiMajorAxis',
@@ -61,11 +48,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const binds = schema.map(attr => {
         const attrLocation = shader.getBuffer(attr, 1, r.gl.FLOAT, false, 0, 0);
-        console.log(
-            attr,
-            (orbits.flatMap(({[attr]: v}) => v)),
-            new Float32Array(orbits.flatMap(({[attr]: v}) => v))
-        )
         return () => {
             r.gl.bindBuffer(r.gl.ARRAY_BUFFER, attrLocation)
             r.gl.bufferData(
@@ -90,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         r.gl.clear(r.gl.COLOR_BUFFER_BIT | r.gl.DEPTH_BUFFER_BIT);
 
         // Pass uniform data
-        r.gl.uniform1f(timeLocation, time);
+        r.gl.uniform1f(timeLocation, time * 10);
         r.gl.uniformMatrix4fv(projMatrixLocation, false, projMatrix);
         r.gl.uniformMatrix4fv(viewMatrixLocation, false, viewMatrix);
         r.gl.uniformMatrix4fv(motionMatrixLocation, false, motionMatrix);

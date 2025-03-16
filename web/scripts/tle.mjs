@@ -8,9 +8,8 @@ const MATCH_TLE_PARAMS = /^2\s+\d{5}\s+(?<inclination>.{1,8})\s+(?<raan>.{1,8})\
  * @param {string} tle 
  * @returns 
  */
-function parseTLE(tle) {
+function parseTLE(line) {
     /** @type {string} */
-    const line = tle.split("\n").map(line => line.trim())[2]
     const params = MATCH_TLE_PARAMS.exec(line).groups
     
     return {
@@ -19,8 +18,8 @@ function parseTLE(tle) {
     }
 }
 
-export function computeOrbit(tleLines) {
-    const tle = parseTLE(tleLines),
+export function computeOrbit(line) {
+    const tle = parseTLE(line),
         n = (tle.meanMotion * 2 * Math.PI) / 86400,
         a = Math.cbrt(MU / (n * n))
     
