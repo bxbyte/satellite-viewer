@@ -1,43 +1,19 @@
-import { notNull } from "./utils.mjs"
+import { notNull, load } from "./utils.mjs"
 import { Renderer } from "./renderer.mjs"
 import { M4x4 } from "./matrix.mjs"
+import { sphere } from "./shape.mjs"
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const r = new Renderer(
         notNull(document.getElementById("cvs"), "Canvas not found")
     )
 
-    console.log(r) 
-
-    const shader = r.createShader(
-        `#version 300 es
-        precision highp float;
-
-        in vec4 color_pt;
-        out vec4 color;
-
-        void main() {
-            color = color_pt;
-        }`,
-        `#version 300 es
-        
-        uniform mat4 projection;
-        uniform mat4 view;
-        uniform mat4 motion;
-
-        in vec3 coord;
-        
-        in vec3 color;
-        out vec4 color_pt;
-
-        void main() {
-            color_pt = vec4(color, 1);
-            gl_Position = projection * view * motion * vec4(coord, 1.);
-            gl_PointSize = 5.0;
-        }`
-    )
+    const shader = r.createShader(...(await Promise.all(([
+        "./shaders/shader.frag", 
+        "./shaders/shader.vert", 
+    ]).map(f => load(new URL(f, import.meta.url))))))
     shader.use()
-    
+
     const vao = r.gl.createVertexArray()
     r.gl.bindVertexArray(vao)
 
@@ -64,37 +40,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const motionMatrix = M4x4.identity()
     const motionMatrixLocation = shader.getUniform("motion")
 
-    /**
-     * 
-     * @param  {...number} shape 
-     * @returns {number[]}
-     */
-    function card(...shape) {
-        const n = shape.shift()
-        let set = Array.from({length: n}, (_, i) => [i])
-    
-        if (shape.length) {
-            const subSet = card(...shape)
-            set = set.flatMap(a => subSet.map((b) => [...a, ...b]))
-        }
 
-        return set
-    }
-
-    const points = (() => { // Grid mesh
-        const shape = [20, 20, 20],
-            origin = [0, 0, 0],
-            scale = [.1, .1, .1]
-
-
-        const c = card(...shape)
-        return c.map(c => ({ 
-            coord: c.map((v, i) => 
-                (v - (shape[i] - 1) / 2) * scale[i] + origin[i]
-            ), 
-            color: c.map((v, i) => v / (shape[i] - 1))
-        }))
-    })()
+    const points = sphere({
+        lat: 16,
+        lon: 8
+    })
 
     const vertexs = shader.getBuffer("coord", 3, r.gl.FLOAT, false, 0, 0);
     r.gl.bindBuffer(r.gl.ARRAY_BUFFER, vertexs)
@@ -113,9 +63,9 @@ document.addEventListener("DOMContentLoaded", () => {
     )
     
     r.render((dt) => {
-        motionMatrix.rotateZ(dt * .005)
-        motionMatrix.rotateY(dt * .002)
-        motionMatrix.rotateX(dt * .003)
+        motionMatrix.rotateZ(dt * .001)
+        motionMatrix.rotateY(dt * .001)
+        motionMatrix.rotateX(dt * .001)
 
         // Enable the depth test
         r.gl.enable(r.gl.DEPTH_TEST);
@@ -131,8 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
         r.gl.uniformMatrix4fv(motionMatrixLocation, false, motionMatrix);
 
         // Draw the points
-        // r.gl.drawArrays(r.gl.LINE_LOOP, 0, points.length);
-        r.gl.drawArrays(r.gl.POINTS, 0, points.length);
+        r.gl.drawArrays(r.gl.LINE_STRIP, 0, points.length);
         // r.gl.drawArrays(r.gl.TRIANGLE_FAN, 0, points.length);
+        r.gl.drawArrays(r.gl.POINTS, 0, points.length);
     })
 })
