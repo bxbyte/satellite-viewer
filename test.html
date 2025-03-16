@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite in WebGL</title>
+    <link rel="stylesheet" href="./web/index.css">
+</head>
+<body>
+    <canvas id="glCanvas"></canvas>
+    <script>
+        const MU = 398600.4418;  
+        const EARTH_RADIUS = 6371; 
+        const DEG_TO_RAD = Math.PI / 180;
+
+        // Parse TLE
+        function parseTLE(tle) {
+            let lines = tle.split("\n").map(line => line.trim());
+            return {
+                inclination: parseFloat(lines[1].substr(8, 8)),  
+                raan: parseFloat(lines[1].substr(17, 8)),       
+                eccentricity: parseFloat("0." + lines[1].substr(26, 7)), 
+                argumentOfPerigee: parseFloat(lines[1].substr(34, 8)),
+                meanAnomaly: parseFloat(lines[1].substr(43, 8)),
+                meanMotion: parseFloat(lines[1].substr(52, 11))  
+            };
+        }
+
+        function computeOrbitParams(tle) {
+            let n = (tle.meanMotion * 2 * Math.PI) / 86400; 
+            let a = Math.cbrt(MU / (n * n)); 
+            return {
+                semiMajorAxis: a / EARTH_RADIUS, 
+                inclinationRad: tle.inclination * DEG_TO_RAD,
+                raanRad: tle.raan * DEG_TO_RAD,
+                argumentOfPerigeeRad: tle.argumentOfPerigee * DEG_TO_RAD,
+                meanAnomalyRad: tle.meanAnomaly * DEG_TO_RAD,
+                meanMotionRad: n
+            };
+        }
+
+        const tle = `ISS (ZARYA)
+1 25544U 98067A   24075.54947917  .0016717  00000+0  30250-3 0  9991
+2 25544  51.6423  98.2213 0004811  93.2234  61.5552 15.49661612394797`;
+
+// const tle = `LANDSAT 9
+// 1 49260U 21088A 25075.17120043 .00001177 00000+0 27116-3 0 9992
+// 2 49260 98.1972 147.0836 0001139 91.5543 268.5786 14.57133273 184291`
+
+        let tleData = parseTLE(tle);
+        let orbitParams = computeOrbitParams(tleData);
+
+        // WebGL setup
+        const canvas = document.getElementById("glCanvas");
+        const gl = canvas.getContext("webgl");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+
+        // Vertex Shader (Compute ECI Coordinates)
+        const vertexShaderSource = `
+        attribute vec3 position;
+        uniform float time;
+        uniform float semiMajorAxis;
+        uniform float eccentricity;
+        uniform float inclination;
+        uniform float raan;
+        uniform float argumentOfPerigee;
+        uniform float meanAnomaly;
+        uniform float meanMotion;
+
+        varying vec3 eciCoord;
+
+        float solveKepler(float M, float e) {
+            float E = M;
+            for (int i = 0; i < 10; i++) {
+                E = E - (E - e * sin(E) - M) / (1.0 - e * cos(E));
+            }
+            return E;
+        }
+
+        void main() {
+            float M = meanAnomaly + meanMotion * time;
+            float E = solveKepler(M, eccentricity);
+            float v = 2.0 * atan(sqrt((1.0 + eccentricity) / (1.0 - eccentricity)) * tan(E / 2.0));
+
+            float r = semiMajorAxis * (1.0 - eccentricity * cos(E));
+            float xOrbital = r * cos(v);
+            float yOrbital = r * sin(v);
+            float zOrbital = 0.0;
+
+            // Rotation matrices
+            float cosRAAN = cos(raan);
+            float sinRAAN = sin(raan);
+            float cosIncl = cos(inclination);
+            float sinIncl = sin(inclination);
+            float cosArgPerigee = cos(argumentOfPerigee);
+            float sinArgPerigee = sin(argumentOfPerigee);
+
+            // Apply rotations in the correct order
+            float xTemp = xOrbital * cosArgPerigee - yOrbital * sinArgPerigee;
+            float yTemp = xOrbital * sinArgPerigee + yOrbital * cosArgPerigee;
+            float zTemp = zOrbital;
+
+            float xIncl = xTemp;
+            float yIncl = yTemp * cosIncl;
+            float zIncl = yTemp * sinIncl;
+
+            float xECI = xIncl * cosRAAN - yIncl * sinRAAN;
+            float yECI = xIncl * sinRAAN + yIncl * cosRAAN;
+            float zECI = zIncl;
+
+            eciCoord = vec3(xECI, yECI, zECI);
+            
+            gl_Position = vec4(eciCoord * 80., 1.0);
+
+            gl_PointSize = 10.0; // Size of the point
+        }`;
+
+        // Fragment Shader
+        const fragmentShaderSource = `
+        precision mediump float;
+        varying vec3 eciCoord;
+        void main() {
+            gl_FragColor = vec4(1, 1, 1, 1.0);
+        }`;
+
+        function createShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            return shader;
+        }
+
+        function createProgram(gl, vertexShader, fragmentShader) {
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            return program;
+        }
+
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+        const program = createProgram(gl, vertexShader, fragmentShader);
+        gl.useProgram(program);
+
+        // Set uniforms
+        function setUniforms() {
+            console.log(
+                orbitParams,
+                tleData
+            )
+             console.log(
+                orbitParams.eccentricity,
+                tleData.eccentricity
+            )
+            gl.uniform1f(gl.getUniformLocation(program, "semiMajorAxis"), orbitParams.semiMajorAxis);
+            gl.uniform1f(gl.getUniformLocation(program, "eccentricity"), tleData.eccentricity);
+            gl.uniform1f(gl.getUniformLocation(program, "inclination"), orbitParams.inclinationRad);
+            gl.uniform1f(gl.getUniformLocation(program, "raan"), orbitParams.raanRad);
+            gl.uniform1f(gl.getUniformLocation(program, "argumentOfPerigee"), orbitParams.argumentOfPerigeeRad);
+            gl.uniform1f(gl.getUniformLocation(program, "meanAnomaly"), orbitParams.meanAnomalyRad);
+            gl.uniform1f(gl.getUniformLocation(program, "meanMotion"), orbitParams.meanMotionRad);
+        }
+
+        setUniforms();
+
+        function render(time) {
+            gl.uniform1f(gl.getUniformLocation(program, "time"), time / 1000.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.POINTS, 0, 1);
+            requestAnimationFrame(render);
+        }
+
+        render(0);
+    </script>
+</body>
+</html>

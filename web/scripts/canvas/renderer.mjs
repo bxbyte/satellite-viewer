@@ -1,4 +1,4 @@
-import { notNull } from './utils.mjs'
+import { notNull } from '../utils.mjs'
 import { ShaderProgram } from './shader-program.mjs';
 
 export class Renderer {
@@ -12,7 +12,8 @@ export class Renderer {
         this.cvs = cvs;
         this.gl = notNull(
             cvs.getContext("webgl2", {
-                premultipliedAlpha: false // Use alpha
+                premultipliedAlpha: false, // Use alpha
+                powerPreference: 'high-performance',
             }), 
             "Your browser doesn't support the Webgl2 API"
         );
@@ -33,7 +34,7 @@ export class Renderer {
 
     /**
      * 
-     * @param {(deltaTime: number) => void} callback 
+     * @param {(time: number, deltaTime: number) => void} callback 
      */
     render(callback, maxFPS = 120) {
         const timeout = 1000 / maxFPS
@@ -41,7 +42,7 @@ export class Renderer {
         const frameCallback = (time) => {
             const deltaTime = time - lastTime
             if (timeout <= deltaTime) {
-                callback(deltaTime)
+                callback(time, deltaTime)
                 lastTime = time
             }
             this.#renderRequestId = requestAnimationFrame(frameCallback)   
