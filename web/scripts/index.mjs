@@ -1,8 +1,7 @@
-import { notNull } from "./utils.mjs"
+import { notNull, load } from "./utils.mjs"
 import { Renderer } from "./canvas/renderer.mjs"
 import { M4x4 } from "./canvas/matrix.mjs"
-import { computeOrbit } from "./tle.mjs"
-import { getTLE } from "./api.mjs"
+import { getOrbits } from "./api.mjs"
 
 document.addEventListener("DOMContentLoaded", async () => {
     const r = new Renderer(
@@ -12,10 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const shader = r.createShader(...(await Promise.all(([
         "./shaders/orbits.frag", 
         "./shaders/orbits.vert", 
-    ]).map(async f => {
-        const res = await fetch(new URL(f, import.meta.url))
-        return await res.text()
-    }))))
+    ]).map(async f => load(new URL(f, import.meta.url))))))
 
     shader.use()
 
@@ -26,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const projMatrixLocation = shader.getUniform("projection")
 
     const viewMatrix = M4x4.identity()
-    viewMatrix[14] = viewMatrix[14]-4; //zoom
+    viewMatrix[14] = viewMatrix[14] - 15; // zoom
     const viewMatrixLocation = shader.getUniform("view")
 
     const motionMatrix = M4x4.identity()
@@ -34,8 +30,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const timeLocation = shader.getUniform("time")
 
-    const orbits = await getTLE()
-
+    const orbits = await getOrbits()
+  
     const schema = [
         'eccentricity',
         'semiMajorAxis',
@@ -60,7 +56,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     const bind = () => binds.forEach(b => b())
     bind()
-
+        
+    motionMatrix.rotateX(Math.PI / 4)
+    motionMatrix.rotateY(Math.PI / 4)
     r.render((time) => {
         // Enable the depth test
         r.gl.enable(r.gl.DEPTH_TEST);
@@ -72,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         r.gl.clear(r.gl.COLOR_BUFFER_BIT | r.gl.DEPTH_BUFFER_BIT);
 
         // Pass uniform data
-        r.gl.uniform1f(timeLocation, time * 10);
+        r.gl.uniform1f(timeLocation, time);
         r.gl.uniformMatrix4fv(projMatrixLocation, false, projMatrix);
         r.gl.uniformMatrix4fv(viewMatrixLocation, false, viewMatrix);
         r.gl.uniformMatrix4fv(motionMatrixLocation, false, motionMatrix);

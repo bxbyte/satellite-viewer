@@ -14,10 +14,10 @@ export class Renderer {
             cvs.getContext("webgl2", {
                 premultipliedAlpha: false, // Use alpha
                 powerPreference: 'high-performance',
+                // preserveDrawingBuffer: true 
             }), 
             "Your browser doesn't support the Webgl2 API"
         );
-
         // Set size
         window.addEventListener("resize", () => this.#updateSize())
         this.#updateSize()

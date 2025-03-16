@@ -1,14 +1,10 @@
-import { computeOrbit } from "./tle.mjs"
+import { parseTLEs, TLE2Orbit } from "./tle.mjs"
+import { load } from "./utils.mjs"
 
-const API_ORIGIN = new URL("https://tle.ivanstanojevic.me/api/")
+const API_ORIGIN = new URL("https://celestrak.org")
 
-export async function getTLE(params = { 'page-size': 100 }) {
-    const url = new URL("./tle", API_ORIGIN)
-    console.log(url)
-    Object.entries(params)
-        .forEach(([k, v]) => url.searchParams.set(k, v))
-    const res = await fetch(url)
-    const data = await res.json()
-
-    return data.member.map(({line2}) => computeOrbit(line2))
+export async function getOrbits() {
+    return [...parseTLEs(
+        await load(new URL("/NORAD/elements/gp.php?GROUP=active&FORMAT=2le", API_ORIGIN))
+    )].map(TLE2Orbit)
 }
