@@ -24,9 +24,9 @@ export class ShaderProgram {
         
         if (!this.gl.getProgramParameter(this.#shaderProgram, this.gl.LINK_STATUS)) {
             throw new Error([
-                this.gl.getProgramInfoLog(this.#shaderProgram),
-                this.gl.getShaderInfoLog(fragShader),
-                this.gl.getShaderInfoLog(vertShader)
+                "Program : " + this.gl.getProgramInfoLog(this.#shaderProgram),
+                "Fragment : " + this.gl.getShaderInfoLog(fragShader),
+                "Vertex : " + this.gl.getShaderInfoLog(vertShader)
             ].join('\n'))
         }
     }
@@ -37,10 +37,16 @@ export class ShaderProgram {
 
     /**
      * 
+     * @typedef {Extract<keyof WebGL2RenderingContext, `uniform${string}`>} UniformKeys
+     * @typedef {UniformKeys extends `uniform${infer U}` ? U : never} UniformTypes
+     * 
      * @param {string} name
+     * @param {UniformTypes} type
      */
-    getUniform(name) {
-        return this.gl.getUniformLocation(this.#shaderProgram, name)
+    getUniformSetter(name, type) {
+        const setter = this.gl[`uniform${type}`].bind(this.gl), 
+            location = this.gl.getUniformLocation(this.#shaderProgram, name)
+        return (...args) => setter(location, ...args)
     }
 
     /**

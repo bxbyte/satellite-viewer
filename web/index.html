@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Satellite visualizer</title>
     <script src="./scripts/index.mjs" type="module"></script>
-    <link rel="stylesheet" href="./index.css">
+    <link rel="stylesheet" href="./styles/index.css">
 </head>
 <body>
     <main>
-        <canvas id="cvs"></canvas>
+        <nav>
+            <form>
+                <input name="search" type="text">
+            </form>
+        </nav>
+        <canvas id="cvs">Your browser doesn't support the Webgl2 API</canvas>
     </main>
 </body>
 </html>
