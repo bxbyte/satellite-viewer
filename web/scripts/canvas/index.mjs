@@ -40,7 +40,7 @@ export class OrbitsCanvas {
             }
         })
                         
-        const projectionMatrix = M4x4.projection(40, r.cvs.width / r.cvs.height, 0, 100)
+        let projectionMatrix = M4x4.projection(40, r.cvs.width / r.cvs.height, 0, 100)
         addEventListener("resize", () => {
             projectionMatrix = M4x4.projection(40, r.cvs.width / r.cvs.height, 1, 100)
         })
