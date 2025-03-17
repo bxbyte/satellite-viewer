@@ -8,6 +8,7 @@
 
 import { writeFileSync } from "fs"
 
+import { load } from "./web/scripts/utils.mjs"
 import { parseTLEs, TLE2Orbit } from "./web/scripts/tle.mjs"
 
 const API_CALL = new URL("https://celestrak.org/NORAD/elements/gp.php")
@@ -15,10 +16,8 @@ API_CALL.searchParams.set("FORMAT","2LE")
 API_CALL.searchParams.set("SPECIAL","GPZ-PLUS")
 API_CALL.searchParams.set("GROUP","ACTIVE")
 
-const res = await fetch(API_CALL),
-    TLEs = res.json()
-
-const orbits = [...parseTLEs(TLEs)].map(TLE2Orbit),
+const TLEs = await load(API_CALL),
+    orbits = [...parseTLEs(TLEs)].map(TLE2Orbit),
     orbitsBuffer = new Float32Array(orbits.flatMap((orbit) => Object.values(orbit)))
 
 // Write buffer
