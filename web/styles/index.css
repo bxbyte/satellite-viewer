@@ -1,21 +1,157 @@
-body {
+/* Remove default */
+
+input, button {
+    all: unset;
+}
+
+* {
     margin: 0;
-    min-height: 100vh;
-    background-color: rgb(10, 9, 9);
-    color: #fff;
+    padding: 0;
+}
+
+/* Global style */
+
+:root {
+    /* Colors */
+    --color-light-0: #e2dbdb;
+    --color-dark-0: #0a0909;
+    --color-dark-1: #1a1818;
+    
+    /* SVG images */
+    --svg-load: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-dasharray='16' stroke-dashoffset='16' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3c4.97 0 9 4.03 9 9'%3E%3Canimate fill='freeze' attributeName='stroke-dashoffset' dur='0.2s' values='16;0'/%3E%3CanimateTransform attributeName='transform' dur='1.5s' repeatCount='indefinite' type='rotate' values='0 12 12;360 12 12'/%3E%3C/path%3E%3C/svg%3E");
+    --svg-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m19.6 21l-6.3-6.3q-.75.6-1.725.95T9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l6.3 6.3zM9.5 14q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14'/%3E%3C/svg%3E");
+}
+
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 100;
+    color: var(--color-light-0);
+}
+
+/* General style */
+
+input, output, button {
+    border-radius: .5em;
+}
+
+input, button {
+    padding: .4em .8em;
+}
+
+input, output {
+    background: var(--color-dark-0);
+}
+
+input::placeholder {
+    opacity: .5;
+}
+
+output {
+    padding: .8em .8em;
+}
+
+button {
+    background: var(--color-light-0);
+    color: var(--color-dark-0);
+}
+
+a {
+    text-underline-offset: .2em;
+}
+
+/* Specific style */
+
+body {
     display: flex;
+    height: 100vh;
+    max-height: 100vh;
+    background: var(--color-dark-0);
 }
 
 main {
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
-}
-
-nav {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1em;
+    width: 100%;
 }
 
 canvas {
     width: 100%;
     height: 100%;
+    flex-grow: 1;
+}
+
+nav {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    justify-content: space-between;
+    padding: 1em;
+    box-sizing: border-box;
+    background: var(--color-dark-1);
+    width: min-content;
+
+    & > * {
+        display: flex;
+        flex-direction: column;
+        gap: .5em;
+    }
+}
+
+form {
+    & > div {
+        display: flex;
+        gap: .5em;
+
+        & > button {
+            display: inline-flex;
+            white-space: pre;
+            align-items: center;
+            gap: .5em;
+
+            &::after {
+                content: '';
+                width: .9em;
+                height: .8em;
+                background-color: currentColor;
+                mask-image: var(--svg-search);
+                mask-repeat: no-repeat;
+                mask-size: 100% 100%;
+            }
+        }
+    }
+
+    & > output {
+        & > ul {
+            display: flex;
+            flex-direction: column;
+            height: 16rem;
+            overflow: scroll;
+            gap: .3em;
+
+            li {
+                list-style: '•  ' inside;
+            }
+    
+            &::before {
+                content: 'No satellites found';
+                opacity: .5;
+                font-size: .8em;
+                width: 100%;
+            }
+    
+            &:not(:empty)::before {
+                content: attr(data-total-items) ' found (' attr(data-loaded-items) ' loaded)';
+            }
+        }
+
+        /* Don't show till the prompt is used */
+        &:not(:has([data-total-items])) {
+            display: none;
+        }
+    }
+
+    &.loading {
+        --svg-search: var(--svg-load);
+    }
 }

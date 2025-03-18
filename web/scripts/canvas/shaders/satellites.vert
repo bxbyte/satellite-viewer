@@ -16,8 +16,8 @@ in float argumentOfPerigee;
 in float meanAnomaly;
 in float meanMotion;
 
-in vec3 color;
-out vec4 g_Color;
+in float group;
+out vec4 color;
 
 vec3 computeECI() {
 
@@ -55,6 +55,5 @@ void main() {
   vec4 viewportCoord = motion * vec4(computeECI(), 1.0);
   gl_Position = projection * view * viewportCoord;
   gl_PointSize = 1.7; // Size of the point
-  //   g_Color = vec4(1, viewportCoord[2], 1, 1);
-  g_Color = vec4(color, 1);
+  color = vec4(1, vec2(group), 1);
 }

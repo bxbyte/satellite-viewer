@@ -81,12 +81,14 @@ export class SatellitesCanvas {
     motionMatrix.rotateX(Math.PI / 4);
     motionMatrix.rotateY(Math.PI / 4);
 
-    r.render((time) => {
+    r.render((time, dt) => {
+      viewMatrix.rotateY(dt / 1000)
+
       // Enable the depth test
       r.gl.enable(r.gl.DEPTH_TEST);
       r.gl.depthFunc(r.gl.LEQUAL);
 
-      // Clear canvas
+      // // Clear canvas
       r.gl.clearColor(0, 0, 0, 0);
       r.gl.clearDepth(1);
       r.gl.clear(r.gl.COLOR_BUFFER_BIT | r.gl.DEPTH_BUFFER_BIT);
@@ -110,11 +112,11 @@ export class SatellitesCanvas {
     this.#satellites = satellites;
     this.satellitesBinds.forEach((b) => b());
 
-    // TODO : rework the colros
+    // TODO : rework the colors
     const colorLocation = this.satellitesShader.getBuffer(
-      "color",
-      3,
-      this.r.gl.FLOAT,
+      "group",
+      1,
+      this.r.gl.UNSIGNED_BYTE,
       false,
       0,
       0
@@ -123,13 +125,7 @@ export class SatellitesCanvas {
     this.r.gl.bindBuffer(this.r.gl.ARRAY_BUFFER, colorLocation);
     this.r.gl.bufferData(
       this.r.gl.ARRAY_BUFFER,
-      new Float32Array(
-        this.#satellites.flatMap((_, i) => [
-          Math.random(),
-          Math.random(),
-          Math.random(),
-        ])
-      ),
+      new Uint8Array(this.#satellites.map(() => Math.round(Math.random()))),
       this.r.gl.STATIC_DRAW
     );
   }

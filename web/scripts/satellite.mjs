@@ -72,21 +72,21 @@ export class Satellite {
 
   /**
    *
-   * @param {Float32Array} satellitesBuffer
+   * @param {ArrayBuffer} satellitesBuffer
    * @returns {Satellite[]}
    */
   static async collectionFromBuffer(satellitesBuffer) {
-    /** @type {Satellite[]} */
-    const satellites = new Array(
-      satellitesBuffer.length / SATELLITES_PARAMS.length
-    );
+    
+    const floatParams = new Float32Array(satellitesBuffer),
+      /** @type {Satellite[]} */
+      satellites = new Array(floatParams.length / SATELLITES_PARAMS.length);
 
     let i = 0, // Index in satellites buffer
       j = 0; // Index in satellites array (j = i / SATELLITES_PARAMS.length)
-    for (; i < satellitesBuffer.length; i += SATELLITES_PARAMS.length) {
+    for (; i < floatParams.length; i += SATELLITES_PARAMS.length) {
       const satellite = (satellites[j++] = new Satellite());
       SATELLITES_PARAMS.map(
-        (k, offset) => (satellite[k] = satellitesBuffer[i + offset])
+        (k, offset) => (satellite[k] = floatParams[i + offset])
       );
     }
     return satellites;

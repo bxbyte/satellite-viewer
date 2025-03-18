@@ -5,9 +5,8 @@ import { search } from "./api.mjs";
 
 /** Pre-transformed binary satellites ( @see /celestrak-pipe.mjs ) */
 const defaultSatellites = await (async () => {
-  const res = await fetch(new URL("../data/satellites.bin", import.meta.url)),
-    satellitesBuffer = new Float32Array(await res.arrayBuffer());
-  return Satellite.collectionFromBuffer(satellitesBuffer);
+  const res = await fetch(new URL("../data/satellites.bin", import.meta.url));
+  return Satellite.collectionFromBuffer(await res.arrayBuffer());
 })();
 
 function main() {
@@ -27,23 +26,20 @@ function main() {
       // When no search string
       if (!params.search) return;
 
+      // Set loading style
+      form.classList.add("loading")
+
       // API call
       const data = await search(params);
 
-      // When nothing is found
-      if (data.totalItems == 0) {
-        const row = document.createElement("li");
-        row.innerText = "Nothing found";
-        searchResults.replaceChildren(row);
-        return;
-      }
+      searchResults.dataset.totalItems = data.totalItems
+      searchResults.dataset.loadedItems = data.member.length
 
       // Update satellites
       const satellites = data.member.map(({ line2 }) =>
         Satellite.fromTLE(line2)
       );
-      console.log(satellites);
-      satelliteCanvas.setSatellites(satellites);
+      satelliteCanvas.setSatellites(satellites); 
 
       // Update row results
       const rows = data.member.map(({ name }) => {
@@ -52,6 +48,9 @@ function main() {
         return row;
       });
       searchResults.replaceChildren(...rows);
+
+      // Remove loading style
+      form.classList.remove("loading")
     })
   );
 }
