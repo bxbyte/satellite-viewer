@@ -28,7 +28,19 @@ input, button {
     color: var(--color-light-0);
 }
 
-/* General style */
+/* Generic style */
+
+::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-light-0), transparent 50%);
+    border-radius: 1em;
+}
+
+::-webkit-scrollbar,
+::-webkit-scrollbar-corner {
+    background: transparent;
+    width: .2em;
+}
+
 
 input, output, button {
     border-radius: .5em;
@@ -42,8 +54,16 @@ input, output {
     background: var(--color-dark-0);
 }
 
-input::placeholder {
-    opacity: .5;
+input {
+    /* Fix autocomplete horride color */
+    &:-webkit-autofill,
+    &:-webkit-autofill:focus {
+        transition-delay: calc(infinity * 1s);
+    }
+
+    &::placeholder {
+        opacity: .5;
+    }
 }
 
 output {
@@ -126,7 +146,7 @@ form {
             display: flex;
             flex-direction: column;
             height: 16rem;
-            overflow: scroll;
+            overflow-y: scroll;
             gap: .3em;
 
             li {
