@@ -9,12 +9,17 @@
 </head>
 <body>
     <main>
+        <canvas id="cvs">Your browser doesn't support the Webgl2 API</canvas>
         <nav>
-            <form>
+            <form onsubmit="return false;">
                 <input name="search" type="text">
+                <button type="submit">Search</button>
+                <output name="results">
+                    <ul>
+                    </ul>
+                </output>
             </form>
         </nav>
-        <canvas id="cvs">Your browser doesn't support the Webgl2 API</canvas>
     </main>
 </body>
 </html>
