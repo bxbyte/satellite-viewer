@@ -1,27 +1,18 @@
-import { OrbitsCanvas } from "./canvas/index.mjs";
-import { ORBITS_PARAMS, parseTLEs, TLE2Orbit } from "./tle.mjs";
+import { SatellitesCanvas } from "./canvas/index.mjs";
+import { Satellite } from "./satellite.mjs";
 import { getElement, throttleFn } from "./utils.mjs";
 import { search } from "./api.mjs";
 
-/** Pre-transformed binary orbits ( @see /celestrak-pipe.mjs ) */
-const defaultOrbits = await (async () => {
-  const res = await fetch(new URL("../data/orbits.bin", import.meta.url)),
-    orbitsBuffer = new Float32Array(await res.arrayBuffer());
-
-  const orbits = new Array(orbitsBuffer.length / ORBITS_PARAMS.length);
-  let k = 0;
-  for (let i = 0; i < orbitsBuffer.length; i += ORBITS_PARAMS.length) {
-    orbits[k++] = Object.fromEntries(
-      ORBITS_PARAMS.map((k, offset) => [k, orbitsBuffer[i + offset]])
-    );
-  }
-
-  return orbits;
+/** Pre-transformed binary satellites ( @see /celestrak-pipe.mjs ) */
+const defaultSatellites = await (async () => {
+  const res = await fetch(new URL("../data/satellites.bin", import.meta.url)),
+    satellitesBuffer = new Float32Array(await res.arrayBuffer());
+  return Satellite.collectionFromBuffer(satellitesBuffer);
 })();
 
 function main() {
-  const orbitCanvas = new OrbitsCanvas(getElement("#cvs"));
-  orbitCanvas.setOrbits(defaultOrbits);
+  const satelliteCanvas = new SatellitesCanvas(getElement("#cvs"));
+  satelliteCanvas.setSatellites(defaultSatellites);
 
   const /** @type {HTMLFormElement} */
     form = getElement("nav>form"),
@@ -47,11 +38,12 @@ function main() {
         return;
       }
 
-      // Update orbits
-      const orbits = data.member.flatMap(({ line2 }) =>
-        [...parseTLEs(line2)].map(TLE2Orbit)
+      // Update satellites
+      const satellites = data.member.map(({ line2 }) =>
+        Satellite.fromTLE(line2)
       );
-      orbitCanvas.setOrbits(orbits);
+      console.log(satellites);
+      satelliteCanvas.setSatellites(satellites);
 
       // Update row results
       const rows = data.member.map(({ name }) => {

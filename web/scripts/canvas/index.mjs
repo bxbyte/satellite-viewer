@@ -1,18 +1,18 @@
 import { load } from "../utils.mjs";
 import { Renderer } from "./renderer.mjs";
 import { M4x4 } from "./matrix.mjs";
-import { ORBITS_PARAMS } from "../tle.mjs";
+import { SATELLITES_PARAMS } from "../satellite.mjs";
 
 /** WebGL fragment and vertex shaders code */
-const orbitsShadersCode = await Promise.all(
-  ["./shaders/orbits.frag", "./shaders/orbits.vert"].map(async (f) =>
+const satellitesShadersCode = await Promise.all(
+  ["./shaders/satellites.frag", "./shaders/satellites.vert"].map(async (f) =>
     load(new URL(f, import.meta.url))
   )
 );
 
-export class OrbitsCanvas {
-  /** @type {Record<typeof ORBITS_PARAMS, number>[]} */
-  #orbits = [];
+export class SatellitesCanvas {
+  /** @type {import("../satellite.mjs").Satellite[]} */
+  #satellites = [];
 
   /**
    *
@@ -21,26 +21,26 @@ export class OrbitsCanvas {
   constructor(cvs) {
     const r = (this.r = new Renderer(cvs));
 
-    this.orbitsShader = r.createShader(...orbitsShadersCode);
-    this.orbitsShader.use();
+    this.satellitesShader = r.createShader(...satellitesShadersCode);
+    this.satellitesShader.use();
 
-    this.setProjectionMatrix = this.orbitsShader.getUniformSetter(
+    this.setProjectionMatrix = this.satellitesShader.getUniformSetter(
       "projection",
       "Matrix4fv"
     );
-    this.setViewMatrix = this.orbitsShader.getUniformSetter(
+    this.setViewMatrix = this.satellitesShader.getUniformSetter(
       "view",
       "Matrix4fv"
     );
-    this.setMotionMatrix = this.orbitsShader.getUniformSetter(
+    this.setMotionMatrix = this.satellitesShader.getUniformSetter(
       "motion",
       "Matrix4fv"
     );
-    this.setTime = this.orbitsShader.getUniformSetter("time", "1f");
+    this.setTime = this.satellitesShader.getUniformSetter("time", "1f");
 
     /** @type {(() => void)[]} */
-    this.orbitsBinds = ORBITS_PARAMS.map((paramName) => {
-      const attrLocation = this.orbitsShader.getBuffer(
+    this.satellitesBinds = SATELLITES_PARAMS.map((paramName) => {
+      const attrLocation = this.satellitesShader.getBuffer(
         paramName,
         1,
         r.gl.FLOAT,
@@ -53,7 +53,7 @@ export class OrbitsCanvas {
         r.gl.bindBuffer(r.gl.ARRAY_BUFFER, attrLocation);
         r.gl.bufferData(
           r.gl.ARRAY_BUFFER,
-          new Float32Array(this.#orbits.flatMap(({ [paramName]: v }) => v)),
+          new Float32Array(this.#satellites.flatMap(({ [paramName]: v }) => v)),
           r.gl.STATIC_DRAW
         );
       };
@@ -98,16 +98,20 @@ export class OrbitsCanvas {
       this.setViewMatrix(false, viewMatrix);
 
       // Draw the points
-      r.gl.drawArrays(r.gl.POINTS, 0, this.#orbits.length);
+      r.gl.drawArrays(r.gl.POINTS, 0, this.#satellites.length);
     });
   }
 
-  setOrbits(v) {
-    this.#orbits = v;
-    this.orbitsBinds.forEach((b) => b());
+  /**
+   *
+   * @param {import("../satellite.mjs").Satellite[]} satellites
+   */
+  setSatellites(satellites) {
+    this.#satellites = satellites;
+    this.satellitesBinds.forEach((b) => b());
 
     // TODO : rework the colros
-    const colorLocation = this.orbitsShader.getBuffer(
+    const colorLocation = this.satellitesShader.getBuffer(
       "color",
       3,
       this.r.gl.FLOAT,
@@ -120,7 +124,7 @@ export class OrbitsCanvas {
     this.r.gl.bufferData(
       this.r.gl.ARRAY_BUFFER,
       new Float32Array(
-        this.#orbits.flatMap((_, i) => [
+        this.#satellites.flatMap((_, i) => [
           Math.random(),
           Math.random(),
           Math.random(),

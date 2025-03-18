@@ -27,8 +27,12 @@ function urlParamBuilder(url, params) {
  * @typedef {{ satelliteId: number, name: string, date: string, line1: string, line2: string }} SatelliteInfo
  */
 
-export async function search(params = { search: "", page: 0, pageSize: 100 }) {
-  const url = urlParamBuilder(new URL(API_BASE), params),
+export async function search({ search = "", page = 1, pageSize = 100 } = {}) {
+  const url = urlParamBuilder(new URL(API_BASE), {
+      search,
+      page,
+      pageSize,
+    }),
     res = await fetch(url);
 
   /** @type {{ totalItems: number, member: SatelliteInfo[] }} */

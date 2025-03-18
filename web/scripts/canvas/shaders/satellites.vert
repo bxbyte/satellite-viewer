@@ -7,7 +7,7 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 motion;
 
-// Orbits params
+// Satellites params
 in float semiMajorAxis;
 in float eccentricity;
 in float inclination;
@@ -32,16 +32,16 @@ vec3 computeECI() {
                        tan(E / 2.0));
 
   float r = semiMajorAxis * (1.0 - eccentricity * cos(E));
-  float xOrbital = r * cos(v);
-  float yOrbital = r * sin(v);
+  float xSatelliteal = r * cos(v);
+  float ySatelliteal = r * sin(v);
 
   // Rotation matrices
   float cosArgPerigee = cos(argumentOfPerigee);
   float sinArgPerigee = sin(argumentOfPerigee);
 
   // Apply rotations in the correct order
-  float xTemp = xOrbital * cosArgPerigee - yOrbital * sinArgPerigee;
-  float yTemp = xOrbital * sinArgPerigee + yOrbital * cosArgPerigee;
+  float xTemp = xSatelliteal * cosArgPerigee - ySatelliteal * sinArgPerigee;
+  float yTemp = xSatelliteal * sinArgPerigee + ySatelliteal * cosArgPerigee;
 
   float yIncl = yTemp * cos(inclination);
   float cosRAAN = cos(raan);
