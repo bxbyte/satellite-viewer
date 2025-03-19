@@ -33,6 +33,15 @@ export class M4x4 extends Array {
 
     /**
      * 
+     * @param {number} a 
+     */
+    updateProjectionRatio(a) {
+        const oldA = this[5] / this[0]
+        this[5] *= a / oldA
+    }
+
+    /**
+     * 
      * @param {number} angle 
      */
     rotateZ(angle) {

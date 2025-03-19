@@ -59,20 +59,17 @@ export class SatellitesCanvas {
       };
     });
 
-    let projectionMatrix = M4x4.projection(
+    const projectionMatrix = M4x4.projection(
       40,
       r.cvs.width / r.cvs.height,
       0,
       100
     );
-    addEventListener("resize", () => {
-      projectionMatrix = M4x4.projection(
-        40,
-        r.cvs.width / r.cvs.height,
-        1,
-        100
-      );
-    });
+
+    /** Update projection ratio on resize */
+    new ResizeObserver(() => projectionMatrix.updateProjectionRatio(
+      r.cvs.width / r.cvs.height
+    )).observe(r.cvs)
 
     const viewMatrix = M4x4.identity();
     viewMatrix[14] = viewMatrix[14] - 15; // zoom
