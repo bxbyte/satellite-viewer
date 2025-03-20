@@ -6,11 +6,13 @@ export class API {
      * @param {URL} entrypoint 
      * @param {*} options 
      * @param {} load 
+     * @param {Record<string, string>} defaultParams 
      * @param {Record<string, string>} renamedParams 
      */
-    constructor({name, entrypoint, options, load, renamedParams = {}}) {
+    constructor({name, entrypoint, options, load, defaultParams = {}, renamedParams = {}}) {
         this.name = name
         this.entrypoint = entrypoint
+        Object.entries(defaultParams).forEach(([k, v]) => this.entrypoint.searchParams.set(k, v))
         this.options = options
         this.optionsName = new Set(Object.keys(options))
         this.load = load

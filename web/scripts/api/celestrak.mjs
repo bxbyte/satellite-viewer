@@ -6,9 +6,14 @@ const COMMON_OPTIONS = {
     INTDES: { type: "text", pattern: "\\d{4}-\\w{3}", placeholder: "yyyy-nnn"},
 }
 
+const COMMON_DEFAULT_PARAMS = {
+    FORMAT: 'TLE'   
+}
+
 export const CelestrakGPApi = new API({
     name: "Celestral GP",
-    entrypoint: new URL("https://celestrak.org/NORAD/elements/gp.php?FORMAT=TLE"),
+    entrypoint: new URL("https://celestrak.org/NORAD/elements/gp.php"),
+    defaultParams: COMMON_DEFAULT_PARAMS, 
     options: {
         ...COMMON_OPTIONS,
         GROUP: { type: "text" },
@@ -20,7 +25,8 @@ export const CelestrakGPApi = new API({
 
 export const CelestrakSubGPApi = new API({
     name: "Celestral SubGP",
-    entrypoint: new URL("https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FORMAT=TLE"),
+    entrypoint: new URL("https://celestrak.org/NORAD/elements/supplemental/sup-gp.php"),
+    defaultParams: COMMON_DEFAULT_PARAMS, 
     options: {
         ...COMMON_OPTIONS,
         SOURCE: [
