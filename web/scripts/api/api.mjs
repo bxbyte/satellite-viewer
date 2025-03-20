@@ -12,6 +12,7 @@ export class API {
         this.name = name
         this.entrypoint = entrypoint
         this.options = options
+        this.optionsName = new Set(Object.keys(options))
         this.load = load
         this.renamedParams = renamedParams
     }

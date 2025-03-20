@@ -24,13 +24,13 @@ function createSelect(displayedName, name, options = []) {
         set options(options) {
             el.replaceChildren(
                 defaultOption,
+                ...el.selectedOptions,
                 ...options.map(option => new Option(option))
             )
         }
     }
-
     select.options = options
-
+    
     return select
 }
 
@@ -60,17 +60,20 @@ export class SearchForm {
         this.searchResultsEl = this.#getFieldEl("results", true)
         this.urlInputEl = this.#getFieldEl("url")
 
-        this.#getFieldEl("add-option")
-            .addEventListener("click", () => {
-                this.addOption()
-            })
+        this.addOptionEl = this.#getFieldEl("add-option")
+        this.addOptionEl.addEventListener("click", () => {
+            this.addOption()
+        })
 
-        this.#getFieldEl("apiName")
-            .append(...Object.keys(APIs).map((apiName) => 
-                new Option(apiName, apiName, null, apiName == this.api.name)
-            ))
+        const apiNameEl = this.#getFieldEl("apiName")
+        apiNameEl.append(...Object.keys(APIs).map((apiName) => 
+            new Option(apiName, apiName, null, apiName == this.api.name)
+        ))
+        apiNameEl.addEventListener("input", () => this.refreshAPI())
 
         this.formEl.addEventListener("input", () => this.refreshURL())
+
+        this.refreshAPI()
         this.refreshURL()
     }
 
@@ -85,28 +88,41 @@ export class SearchForm {
         return getElement(`[name='${fieldName}']` + (list ? ' ul' : ''), this.formEl)
     }
 
-    refreshAPI() {
-        const { apiName } = this.data
-        this.api = APIs[apiName]
-    }
-
     refreshURL() {
         const { params } = this.data
         this.urlInputEl.value = this.api.buildURL(params)
         this.urlInputEl.scrollTo({left: this.urlInputEl.scrollWidth})
     }
 
+    refreshOptions() {
+        this.addOptionEl.disabled = this.optionsEl.childElementCount >=  this.api.optionsName.size
+        this.refreshURL()
+    }
+
+    resetOptions() {
+        this.optionsEl.innerHTML = ''
+        this.refreshOptions()
+    }
+
+    refreshAPI() {
+        const { apiName } = this.data
+        if (this.api.name == apiName) return
+        this.api = APIs[apiName]
+        this.resetOptions()
+    }
+
     addOption() {
         const optRowEl = document.createElement("li")
 
         // Placeholder before choosing option
-        let optInputEl = createInput({ disabled: true, placeholder: 'Value' })
+        let optInputEl = createInput({ disabled: true, placeholder: 'value' })
 
-        const select = createSelect("Option", '*')
+        const select = createSelect("option", '*')
         optRowEl.appendChild(select.el)
         
         select.el.addEventListener("focus", () => {
-            select.options = Object.keys(this.api.options)
+            const { params } = this.data
+            select.options = [...this.api.optionsName.difference(new Set(Object.keys(params)))]
         }, false)
         
         select.el.addEventListener("change", () => {
@@ -114,7 +130,7 @@ export class SearchForm {
             const newOptInputEl = 
                 optInputAttrs instanceof Array 
                 ? createSelect(
-                    "Value", 
+                    "value", 
                     `params.${select.el.value}`, 
                     optInputAttrs
                 ).el
@@ -134,10 +150,11 @@ export class SearchForm {
         optRemoveBtnEl.type = "button"
         optRemoveBtnEl.addEventListener("click", () => {
             optRowEl.remove()
-            this.refreshURL()
+            this.refreshOptions()
         })
 
         this.optionsEl.appendChild(optRowEl)
+        this.refreshOptions()
     }
 
     /**
