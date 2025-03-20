@@ -1,9 +1,10 @@
-import { CelestrakApi } from "./celestrak.mjs"
+import { CelestrakGPApi, CelestrakSubGPApi } from "./celestrak.mjs"
 import { TleApi } from "./tle-api.mjs"
 
-export const defaultAPI = CelestrakApi
+export const defaultAPI = CelestrakGPApi
 
 export const APIs = Object.fromEntries([
-    CelestrakApi,
+    CelestrakGPApi,
+    CelestrakSubGPApi,
     TleApi
 ].map(api => [api.name, api]))
