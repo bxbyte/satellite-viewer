@@ -12,11 +12,23 @@
         <canvas id="cvs">Your browser doesn't support the Webgl2 API</canvas>
         <nav>
             <form onsubmit="return false;">
-                <div>
-                    <input name="search" type="text" placeholder="Search by name">
+                <div aria-label="URL">
+                    <input name="url" type="text" placeholder="URL" readonly>
+                </div>
+                <div aria-label="Name">
+                    <input name="params.name" type="text" required placeholder="Search by name">
+                </div>
+                <div aria-label="API">
+                    <select name="apiName" required></select>
                     <button type="submit">Search</button>
                 </div>
-                <output name="results"><ul></ul></output>
+                <output name="options" aria-label="API Options">
+                    <ul></ul>
+                    <button type="button" name="add-option">Add option</button>
+                </output>
+                <output name="results" aria-label class="box">
+                    <ul></ul>
+                </output>
             </form>
             <div>
                 <h1>Satellite Viewer</h1>

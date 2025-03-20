@@ -19,8 +19,7 @@ export class Renderer {
       "Your browser doesn't support the Webgl2 API"
     );
     // Set size
-    window.addEventListener("resize", () => this.#updateSize());
-    this.#updateSize();
+    this.updateSize();
   }
 
   /**
@@ -54,7 +53,7 @@ export class Renderer {
     cancelAnimationFrame(this.#renderRequestId);
   }
 
-  #updateSize() {
+  updateSize() {
     const s = 1;
     this.cvs.width = Math.floor(this.cvs.clientWidth * s);
     this.cvs.height = Math.floor(this.cvs.clientHeight * s);

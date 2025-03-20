@@ -1,10 +1,12 @@
 import { notNull } from "./utils.mjs";
 
-const MU = 398600.4418;
-const EARTH_RADIUS = 6371;
-const DEG_TO_RAD = Math.PI / 180;
-const MATCH_TLE_PARAMS =
-  /^2\s+\d{5}\s+(?<inclination>.{1,8})\s+(?<raan>.{1,8})\s+(?<eccentricity>\d{1,7})\s+(?<argumentOfPerigee>.{1,8})\s+(?<meanAnomaly>.{1,8})\s+(?<meanMotion>.{1,11})\d{1,5}\d{1}/gm;
+const MU = 398600.4418,
+  EARTH_RADIUS = 6371,
+  DEG_TO_RAD = Math.PI / 180;
+
+const MATCH_2LE_L2 =
+  /2\s+\d{5}\s+(?<inclination>.{1,8})\s+(?<raan>.{1,8})\s+(?<eccentricity>\d{1,7})\s+(?<argumentOfPerigee>.{1,8})\s+(?<meanAnomaly>.{1,8})\s+(?<meanMotion>.{1,11}).{1,5}\d{1}/gm,
+  MATCH_3LE = new RegExp(String.raw`(?<name>^.*$)(?:\s+1.*\s+${MATCH_2LE_L2.source})`, "gm");
 
 export const SATELLITES_PARAMS = [
   "eccentricity",
@@ -17,6 +19,7 @@ export const SATELLITES_PARAMS = [
 ];
 
 export class Satellite {
+  name = ""
   eccentricity = 0;
   semiMajorAxis = 0;
   inclination = 0;
@@ -25,12 +28,7 @@ export class Satellite {
   meanAnomaly = 0;
   meanMotion = 0;
 
-  /**
-   *
-   * @param {Record<SATELLITES_PARAMS, string>} obj
-   * @returns
-   */
-  static #fromTLEStringObject(obj) {
+  static #from2LEStringObject(obj) {
     const satellite = new Satellite();
     obj.eccentricity = "0." + obj.eccentricity;
     SATELLITES_PARAMS.forEach((k) => (satellite[k] = parseFloat(obj[k])));
@@ -53,21 +51,22 @@ export class Satellite {
    * @param {string} tle
    * @returns {Satellite}
    */
-  static fromTLE(tle) {
-    return Satellite.#fromTLEStringObject(
-      notNull(new RegExp(MATCH_TLE_PARAMS).exec(tle).groups, "No TLE found")
+  static from2LE(tle) {
+    return Satellite.#from2LEStringObject(
+      notNull(new RegExp(MATCH_2LE_L2).exec(tle).groups, "No TLE found")
     );
   }
 
   /**
    *
    * @param {string} tles
-   * @returns {Satellite[]}
    */
-  static collectionFromTLEs(tles) {
-    return [...tles.matchAll(MATCH_TLE_PARAMS)].map((o) =>
-      Satellite.#fromTLEStringObject(o.groups)
-    );
+  static collectionFrom3LEs(tles) {
+    return [...tles.matchAll(MATCH_3LE)].map(({ groups: { name, ...params } }) => {
+      const satellite = Satellite.#from2LEStringObject(params)
+      satellite.name = name.trim();
+      return satellite
+    });
   }
 
   /**

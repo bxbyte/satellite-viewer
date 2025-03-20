@@ -1,12 +1,14 @@
 /* Remove default */
 
-input, button {
+input, button, select {
     all: unset;
 }
 
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    list-style: none;
 }
 
 /* Global style */
@@ -16,10 +18,14 @@ input, button {
     --color-light-0: #e2dbdb;
     --color-dark-0: #0a0909;
     --color-dark-1: #1a1818;
+    --color-dark-2: #333030;
+    --color-red-0: #fa5353;
     
     /* SVG images */
     --svg-load: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-dasharray='16' stroke-dashoffset='16' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3c4.97 0 9 4.03 9 9'%3E%3Canimate fill='freeze' attributeName='stroke-dashoffset' dur='0.2s' values='16;0'/%3E%3CanimateTransform attributeName='transform' dur='1.5s' repeatCount='indefinite' type='rotate' values='0 12 12;360 12 12'/%3E%3C/path%3E%3C/svg%3E");
     --svg-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m19.6 21l-6.3-6.3q-.75.6-1.725.95T9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l6.3 6.3zM9.5 14q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14'/%3E%3C/svg%3E");
+    --svg-add: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z'/%3E%3C/svg%3E");
+    --svg-trash: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z'/%3E%3C/svg%3E");
 }
 
 * {
@@ -41,38 +47,81 @@ input, button {
     width: .2em;
 }
 
-
-input, output, button {
-    border-radius: .5em;
-}
-
-input, button {
-    padding: .4em .8em;
-}
-
-input, output {
-    background: var(--color-dark-0);
-}
-
 input {
+    width: 100%;
+
     /* Fix autocomplete horride color */
     &:-webkit-autofill,
     &:-webkit-autofill:focus {
         transition-delay: calc(infinity * 1s);
     }
+}
 
-    &::placeholder {
-        opacity: .5;
+button, select {
+    display: inline-flex;
+    white-space: pre;
+    align-items: center;
+    gap: .5em;
+    user-select: none;
+
+    &::after {
+        content: '';
+        width: 1em;
+        height: 1em;
+        background-color: currentColor;
+        mask-repeat: no-repeat;
+        mask-size: 100% 100%;
     }
 }
 
-output {
-    padding: .8em .8em;
+form:invalid [type=submit] {
+    opacity: .2;
 }
 
-button {
-    background: var(--color-light-0);
-    color: var(--color-dark-0);
+input,
+button,
+select,
+.box {
+    padding: .4em .8em;
+    background: var(--color-dark-0);
+    border-radius: .5em;
+}
+
+input::placeholder,
+input:disabled,
+select:invalid {
+    color: color-mix(in srgb, var(--color-light-0), transparent 60%)
+}
+
+select {
+    border: none;
+    outline: none;
+
+    &:-moz-focusring, 
+    &::-moz-focus-inner {
+        color: transparent !important;
+        text-shadow: 0 0 0 #000 !important;
+        background-image: none !important;
+        border:0;
+    }
+}
+
+[aria-label] {
+    display: flex;
+    position: relative;
+    padding-top: 1.6rem;
+
+    &::before {
+        position: absolute;
+        content: attr(aria-label);
+        font-size: .8rem;
+        opacity: .5;
+        top: .2rem;
+    }
+
+    & > *:is(input, select) {
+        flex: 1;
+    }
 }
 
 a {
@@ -90,15 +139,13 @@ body {
 
 main {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1em;
     width: 100%;
+    grid-template-columns: 1fr minmax(20em, .25fr);
 }
 
 canvas {
     width: 100%;
     height: 100%;
-    flex-grow: 1;
 }
 
 nav {
@@ -108,8 +155,8 @@ nav {
     justify-content: space-between;
     padding: 1em;
     box-sizing: border-box;
+    width: 100%;
     background: var(--color-dark-1);
-    width: min-content;
 
     & > * {
         display: flex;
@@ -119,58 +166,92 @@ nav {
 }
 
 form {
-    & > div {
+    & > * {
         display: flex;
         gap: .5em;
+    }
 
-        & > button {
-            display: inline-flex;
-            white-space: pre;
-            align-items: center;
-            gap: .5em;
+    :not(li) > button {
+        color: var(--color-dark-0);
+        margin-top: auto;
+        background: var(--color-light-0);
+        width: fit-content;
+            
+        &::after {
+            mask-image: var(--svg-search);
+        }
+
+        &[name=add-option] {
+            color: var(--color-light-0);
+            background-color: var(--color-dark-2);
 
             &::after {
-                content: '';
-                width: .9em;
-                height: .8em;
-                background-color: currentColor;
-                mask-image: var(--svg-search);
-                mask-repeat: no-repeat;
-                mask-size: 100% 100%;
+                mask-image: var(--svg-add);
             }
         }
     }
 
-    & > output {
+    [name=options] {
+        &,
         & > ul {
             display: flex;
             flex-direction: column;
-            height: 16rem;
-            overflow-y: scroll;
-            gap: .3em;
-
-            li {
-                list-style: '•  ' inside;
-            }
-    
-            &::before {
-                content: 'No satellites found';
-                opacity: .5;
-                font-size: .8em;
-                width: 100%;
-            }
-    
-            &:not(:empty)::before {
-                content: attr(data-total-items) ' found (' attr(data-loaded-items) ' loaded)';
-            }
+            gap: .4em;
         }
 
-        /* Don't show till the prompt is used */
-        &:not(:has([data-total-items])) {
+        ul:empty {
             display: none;
+        }
+
+        li {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            border: 1px solid var(--color-dark-2);
+            background: var(--color-dark-0);
+            border-radius: .5em;
+            overflow: hidden;
+
+            :first-child ~ * {
+                border-left: 1px solid var(--color-dark-2);
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+    
+            button::after {
+                color: var(--color-red-0);
+                mask-image: var(--svg-trash);
+            }
+    
+            &[name=add-option]s button::after {
+                color: var(--color-light-0);
+                mask-image: var(--svg-add);
+            }
         }
     }
 
+    [name=results] {
+        &, & > ul {
+            display: flex;
+        }
+
+        & > ul {
+            flex-direction: column;
+            overflow-y: scroll;
+            max-height: 16rem;
+            flex: 1;
+            gap: .3em;
+        }
+
+        /* Don't show till the prompt is used */
+        &:not([data-total-items]) {
+            display: none;
+        }
+
+        &:not(:empty)::before {
+            content: attr(data-total-items) ' satellite(s) found';
+        }
+    }
+    
     &.loading {
         --svg-search: var(--svg-load);
     }

@@ -67,9 +67,10 @@ export class SatellitesCanvas {
     );
 
     /** Update projection ratio on resize */
-    new ResizeObserver(() => projectionMatrix.updateProjectionRatio(
-      r.cvs.width / r.cvs.height
-    )).observe(r.cvs)
+    new ResizeObserver(() => {
+      r.updateSize()
+      projectionMatrix.updateProjectionRatio(r.cvs.width / r.cvs.height)
+    }).observe(r.cvs)
 
     const viewMatrix = M4x4.identity();
     viewMatrix[14] = viewMatrix[14] - 15; // zoom
@@ -105,7 +106,7 @@ export class SatellitesCanvas {
    *
    * @param {import("../satellite.mjs").Satellite[]} satellites
    */
-  setSatellites(satellites) {
+  set satellites(satellites) {
     this.#satellites = satellites;
     this.satellitesBinds.forEach((b) => b());
 
