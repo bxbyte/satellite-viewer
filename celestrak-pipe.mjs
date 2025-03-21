@@ -19,7 +19,9 @@ API_CALL.searchParams.set("GROUP", "ACTIVE");
 const TLEs = await load(API_CALL),
   satellites = Satellite.collectionFrom3LEs(TLEs),
   satellitesBuffer = new Float32Array(
-    satellites.flatMap((satellite) => SATELLITES_PARAMS.map(k => satellite[k]))
+    satellites.flatMap((satellite) =>
+      SATELLITES_PARAMS.map((k) => satellite[k]),
+    ),
   );
 
 // Write buffer

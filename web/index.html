@@ -1,46 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Satellite visualizer</title>
     <script src="./scripts/index.mjs" type="module"></script>
-    <link rel="stylesheet" href="./styles/index.css">
-</head>
-<body>
+    <link rel="stylesheet" href="./styles/index.css" />
+  </head>
+  <body>
     <main>
-        <canvas id="cvs">Your browser doesn't support the Webgl2 API</canvas>
-        <nav>
-            <form onsubmit="return false;">
-                <div aria-label="URL">
-                    <input name="url" type="text" placeholder="URL" readonly>
-                </div>
-                <div aria-label="API Source">
-                    <select name="apiName" required></select>
-                    <button type="submit">Search</button>
-                </div>
-                <output name="options" aria-label="API Options">
-                    <ul></ul>
-                    <button type="button" name="add-option">Add option</button>
-                </output>
-                <output name="results" aria-label class="box">
-                    <ul></ul>
-                </output>
-            </form>
-            <div>
-                <h1>Satellite Viewer</h1>
-                <p>
-                    Display calculated satellite coordonates at a given time T,
-                    based on 2LE data from both <a href="https://celestrak.org/">Celestrak</a>
-                    and the <a href="https://tle.ivanstanojevic.me/">TLE API</a> APIs.
-                    <br>
-                    <br>
-                    This is a little project made for a class at the 
-                    <a href="https://iut2.univ-grenoble-alpes.fr">IUT2</a>
-                    of the <a href="https://www.univ-grenoble-alpes.fr/">University of Grenoble Alpes</a>.
-                </p>
-            </div>
-        </nav>
+      <canvas id="cvs">Your browser doesn't support the Webgl2 API</canvas>
+      <nav>
+        <form onsubmit="return false;">
+          <div aria-label="URL">
+            <input name="url" type="text" placeholder="URL" readonly />
+          </div>
+          <div aria-label="API Source">
+            <select name="apiName" required></select>
+            <button type="submit">Search</button>
+          </div>
+          <output name="options" aria-label="API Options">
+            <ul></ul>
+            <button type="button" name="add-option">Add option</button>
+          </output>
+          <output name="results" aria-label class="box">
+            <ul></ul>
+          </output>
+        </form>
+        <div>
+          <h1>Satellite Viewer</h1>
+          <p>
+            Display calculated satellite coordonates at a given time T, based on
+            2LE data from both
+            <a href="https://celestrak.org/">Celestrak</a> and the
+            <a href="https://tle.ivanstanojevic.me/">TLE API</a> APIs.
+            <br />
+            <br />
+            This is a little project made for a class at the
+            <a href="https://iut2.univ-grenoble-alpes.fr">IUT2</a>
+            of the
+            <a href="https://www.univ-grenoble-alpes.fr/"
+              >University of Grenoble Alpes</a
+            >.
+          </p>
+        </div>
+      </nav>
     </main>
-</body>
+  </body>
 </html>

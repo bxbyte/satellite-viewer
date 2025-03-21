@@ -16,7 +16,7 @@ export class Renderer {
         powerPreference: "high-performance",
         preserveDrawingBuffer: true,
       }),
-      "Your browser doesn't support the Webgl2 API"
+      "Your browser doesn't support the Webgl2 API",
     );
     // Set size
     this.updateSize();

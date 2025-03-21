@@ -1,0 +1,11 @@
+{
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "trailingComma": "es5",
+  "tabWidth": 4,
+  "endOfLine": "auto",
+  "semi": false,
+  "useTabs": true,
+  "singleQuote": false,
+  "bracketSpacing": true
+}

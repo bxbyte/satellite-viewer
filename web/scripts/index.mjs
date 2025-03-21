@@ -1,7 +1,7 @@
 import { SatellitesCanvas } from "./canvas/index.mjs";
+import { SearchForm } from "./form/index.mjs";
 import { Satellite } from "./satellite.mjs";
 import { getElement } from "./utils.mjs";
-import { SearchForm } from "./form.mjs";
 
 /** Pre-transformed binary satellites ( @see /celestrak-pipe.mjs ) */
 const defaultSatellites = await (async () => {
@@ -12,9 +12,10 @@ const defaultSatellites = await (async () => {
 function main() {
   const satelliteCanvas = new SatellitesCanvas(getElement("#cvs"));
   const form = new SearchForm(getElement("form"));
-  
+
   satelliteCanvas.satellites = defaultSatellites;
-  form.onresults = async (satellites) => satelliteCanvas.satellites = satellites
+  form.onresults = async (satellites) =>
+    (satelliteCanvas.satellites = satellites);
 }
 
 // Run main
