@@ -1,22 +1,31 @@
+/**
+ * 
+ * @typedef {{label: string, default: boolean}} BaseOptions 
+ * @typedef {BaseOptions & {attrs: *}} InputOptions 
+ * @typedef {BaseOptions  &{values: *}} SelectOptions 
+ * 
+ */
+
 export class API {
     /**
      * 
-     * @param {{ name: string, entrypoint: URL, options: *, load: (res: Response) => Promise<Satellite[]>}}
-     * @param {string} name 
-     * @param {URL} entrypoint 
-     * @param {*} options 
-     * @param {} load 
-     * @param {Record<string, string>} defaultParams 
-     * @param {Record<string, string>} renamedParams 
+     * @template {string} T
+     * @param {{
+     *  name: string,
+     *  entrypoint: URL, 
+     *  load: (res: Response) => Promise<Satellite[]>
+     *  defaultParams: Record<string, string>
+     *  options: Record<T, InputOptions | SelectOptions>, 
+     * }}
      */
-    constructor({name, entrypoint, options, load, defaultParams = {}, renamedParams = {}}) {
+    constructor({name, entrypoint, options, load, defaultParams = {}}) {
         this.name = name
         this.entrypoint = entrypoint
         Object.entries(defaultParams).forEach(([k, v]) => this.entrypoint.searchParams.set(k, v))
+        this.load = load
         this.options = options
         this.optionsName = new Set(Object.keys(options))
-        this.load = load
-        this.renamedParams = renamedParams
+        this.optionsName.delete(this.defaultOption)
     }
 
     /**
@@ -35,9 +44,7 @@ export class API {
         const url = new URL(this.entrypoint)
         Object.entries(params)
             .forEach(([k, v]) => {
-                if (v != "") {
-                    url.searchParams.set(this.renamedParams[k] || k, v)
-                }
+                if (v != "") url.searchParams.set(k, v)
             })
         return url
     }

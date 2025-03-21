@@ -19,13 +19,16 @@ input, button, select {
     --color-dark-0: #0a0909;
     --color-dark-1: #1a1818;
     --color-dark-2: #333030;
-    
+    --color-red-0: #d64747;
+
     /* SVG images */
     --svg-load: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-dasharray='16' stroke-dashoffset='16' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3c4.97 0 9 4.03 9 9'%3E%3Canimate fill='freeze' attributeName='stroke-dashoffset' dur='0.2s' values='16;0'/%3E%3CanimateTransform attributeName='transform' dur='1.5s' repeatCount='indefinite' type='rotate' values='0 12 12;360 12 12'/%3E%3C/path%3E%3C/svg%3E");
     --svg-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m19.6 21l-6.3-6.3q-.75.6-1.725.95T9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l6.3 6.3zM9.5 14q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14'/%3E%3C/svg%3E");
     --svg-add: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z'/%3E%3C/svg%3E");
     --svg-trash: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z'/%3E%3C/svg%3E");
     --svg-bookmark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M6.616 21q-.691 0-1.153-.462T5 19.385V4.615q0-.69.463-1.152T6.616 3h10.769q.69 0 1.153.463T19 4.616v14.769q0 .69-.462 1.153T17.384 21zm0-1h10.769q.23 0 .423-.192t.192-.424V4.616q0-.231-.192-.424T17.384 4H16v6.116l-2-1.193l-2 1.193V4H6.616q-.231 0-.424.192T6 4.615v14.77q0 .23.192.423t.423.192M6 20V4zm6-9.885l2-1.192l2 1.192l-2-1.192z'/%3E%3C/svg%3E");
+    --svg-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='m8 10.207l3.854-3.853l-.707-.708L8 8.793L4.854 5.646l-.708.708z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    --svg-up: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='m8 5.293l3.854 3.853l-.707.708L8 6.707L4.854 9.854l-.708-.708z' clip-rule='evenodd'/%3E%3C/svg%3E");
 }
 
 * {
@@ -48,8 +51,6 @@ input, button, select {
 }
 
 input {
-    width: 100%;
-
     /* Fix autocomplete horride color */
     &:-webkit-autofill,
     &:-webkit-autofill:focus {
@@ -144,6 +145,18 @@ a {
     text-underline-offset: .2em;
 }
 
+select {
+    background-image: var(--svg-down);
+    background-position:
+      calc(100% - .5em) 0.75em;
+    background-repeat: no-repeat;
+    background-blend-mode: lighten;
+
+    &:focus {
+        background-image: var(--svg-up);
+    }
+}
+
 /* Specific style */
 
 body {
@@ -224,25 +237,39 @@ form {
         }
 
         li {
+            --border: 1px solid var(--color-dark-2);
+
             display: grid;
-            grid-template-columns: auto 1fr auto;
-            border: 1px solid var(--color-dark-2);
+            grid-template-areas: 'n t' 'v v';
+            grid-template-columns: 1fr;
+            border: var(--border);
             background: var(--color-dark-0);
             border-radius: .5em;
             overflow: hidden;
 
-            :first-child ~ * {
-                border-left: 1px solid var(--color-dark-2);
-                border-top-left-radius: 0;
-                border-bottom-left-radius: 0;
+            * {
+                border-radius: 0;
+            }
+
+            :nth-child(1), :nth-child(2) {
+                border-bottom: var(--border);
+            }
+
+            :nth-child(2) {
+                border-left: var(--border);
+            }
+
+            :last-child {
+                grid-area: v;
             }
 
             button::after {
                 mask-image: var(--svg-trash);
+                color: var(--color-red-0);
             }
-    
-            &[name=add-option] button::after {
-                mask-image: var(--svg-add);
+
+            &:first-child button {
+                display: none;
             }
         }
     }

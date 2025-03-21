@@ -2,11 +2,12 @@ import { throttleFn, getElement } from "./utils.mjs";
 import { APIs, defaultAPI } from "./api/index.mjs"
 
 /**
+ * @typedef {Record<string, string | import("./api/api.mjs").BaseOptions>} Options
  * 
  * @param {string} displayedName 
  * @param {string} name 
- * @param {string[]} options 
- * @returns 
+ * @param {Options} options 
+ * @returns {HTMLSelectElement & { setOptions: (options: Options) => void }}
  */
 function createSelect(displayedName, name, options = []) {
     const el = document.createElement("select")
@@ -16,22 +17,22 @@ function createSelect(displayedName, name, options = []) {
     const defaultOption = new Option(displayedName, '', true)
     defaultOption.hidden = true
 
-    const select = {
-        el,
-        /**
-         * @param {string[]} options
-         */
-        set options(options) {
-            el.replaceChildren(
-                defaultOption,
-                ...el.selectedOptions,
-                ...options.map(option => new Option(option))
-            )
-        }
+    /**
+     * @param {Record<string, string | import("./api/api.mjs").BaseOptions>} options
+     */
+    el.setOptions = (options)=> {
+        el.replaceChildren(
+            defaultOption,
+            ...el.selectedOptions,
+            ...Object.entries(options)
+                .map(([k, v]) =>
+                    typeof v == "string"
+                    ? new Option(v, k)
+                    : new Option(v.label, k, false, v.default))
+        )
     }
-    select.options = options
-    
-    return select
+    el.setOptions(options)
+    return el
 }
 
 /**
@@ -60,20 +61,20 @@ export class SearchForm {
         this.searchResultsEl = this.#getFieldEl("results", true)
         this.urlInputEl = this.#getFieldEl("url")
 
-        this.addOptionEl = this.#getFieldEl("add-option")
-        this.addOptionEl.addEventListener("click", () => {
-            this.addOption()
-        })
-
         const apiNameEl = this.#getFieldEl("apiName")
         apiNameEl.append(...Object.keys(APIs).map((apiName) => 
             new Option(apiName, apiName, null, apiName == this.api.name)
         ))
         apiNameEl.addEventListener("input", () => this.refreshAPI())
 
+        this.addOptionEl = this.#getFieldEl("add-option")
+        this.addOptionEl.addEventListener("click", () => {
+            this.addOption()
+        })
+
         this.formEl.addEventListener("input", () => this.refreshURL())
 
-        this.refreshAPI()
+        this.resetOptions()
         this.refreshURL()
     }
 
@@ -89,7 +90,7 @@ export class SearchForm {
     }
 
     refreshURL() {
-        const { params } = this.data
+        const { params = {} } = this.data
         this.urlInputEl.value = this.api.buildURL(params)
         this.urlInputEl.scrollTo({left: this.urlInputEl.scrollWidth})
     }
@@ -101,6 +102,7 @@ export class SearchForm {
 
     resetOptions() {
         this.optionsEl.innerHTML = ''
+        this.addOption()
         this.refreshOptions()
     }
 
@@ -111,49 +113,59 @@ export class SearchForm {
         this.resetOptions()
     }
 
+    /**
+     * @type {SearchForm['api']['options']}
+     */
+    get availableApiOptions() {
+        const { params = {} } = this.data
+        return Object.fromEntries(
+            [
+                ...this.api.optionsName.difference(new Set(Object.keys(params)))
+            ].map(k => [k, this.api.options[k]])
+        )
+    }
+
     addOption() {
-        const optRowEl = document.createElement("li")
+        const optRowEl = this.optionsEl.appendChild(document.createElement("li"))
 
-        // Placeholder before choosing option
-        let optInputEl = createInput({ disabled: true, placeholder: 'value' })
+        const select = optRowEl.appendChild(createSelect("Select an option", '*'))
+        const setOptionValues = () => select.setOptions(this.availableApiOptions)
+        select.addEventListener("focus", setOptionValues, false)
+        setOptionValues()
 
-        const select = createSelect("option", '*')
-        optRowEl.appendChild(select.el)
-        
-        select.el.addEventListener("focus", () => {
-            const { params } = this.data
-            select.options = [...this.api.optionsName.difference(new Set(Object.keys(params)))]
-        }, false)
-        
-        select.el.addEventListener("change", () => {
-            const optInputAttrs = this.api.options[select.el.value]
-            const newOptInputEl = 
-                optInputAttrs instanceof Array 
-                ? createSelect(
-                    "value", 
-                    `params.${select.el.value}`, 
-                    optInputAttrs
-                ).el
-                : createInput({
-                    name: `params.${select.el.value}`,
-                    ...this.api.options[select.el.value]
-                })
-            optInputEl.replaceWith(newOptInputEl)
-            optInputEl = newOptInputEl
-        })
-
-        optRowEl.appendChild(optInputEl)
-        
-        const optRemoveBtnEl = document.createElement("button")
-        optRowEl.appendChild(optRemoveBtnEl)
-
+        const optRemoveBtnEl = optRowEl.appendChild(document.createElement("button"))
         optRemoveBtnEl.type = "button"
         optRemoveBtnEl.addEventListener("click", () => {
             optRowEl.remove()
             this.refreshOptions()
         })
 
-        this.optionsEl.appendChild(optRowEl)
+        
+        // Placeholder before choosing option
+        let optInputEl = optRowEl.appendChild(createInput({ disabled: true, placeholder: 'Option value' }))
+        const setOptionInput = () => {
+            const option = this.api.options[select.value]
+            if (!option) return
+
+            const newOptInputEl = 
+                option.attrs
+                ? createInput({
+                    name: `params.${select.value}`,
+                    ...option.attrs
+                })
+                : createSelect(
+                    "Option value", 
+                    `params.${select.value}`, 
+                    option.values
+                )
+                
+            optInputEl.replaceWith(newOptInputEl)
+            optInputEl = newOptInputEl
+        }
+        select.addEventListener("change", setOptionInput)
+        setOptionInput()
+        
+        // Update option list
         this.refreshOptions()
     }
 
