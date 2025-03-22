@@ -7,7 +7,7 @@ function getCurrentHour() {
 async function cleanCache() {
   return Promise.all(
     (await caches.keys())
-      .filter(k => getCurrentHour() - parseInt(k) > MAX_CACHED_LIVE)
+      .filter(k => getCurrentHour() > parseInt(k))
       .map(k => caches.delete(k))
     )
 }
@@ -16,8 +16,8 @@ addEventListener("activate", (ev) => {
   // Take control of the current window
   ev.waitUntil(clients.claim());
   // Cache cleaning
-  setInterval(cleanCache, MAX_CACHED_LIVE)
   ev.waitUntil(cleanCache())
+  setTimeout(cleanCache, MAX_CACHED_LIVE)
 })
 
 // Handle fetch request

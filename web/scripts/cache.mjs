@@ -5,4 +5,4 @@ if (!navigator.serviceWorker.controller) {
 }
 
 // Load cache worker
-await navigator.serviceWorker.register(new URL("../cache-sw.mjs", import.meta.url), {})
+await navigator.serviceWorker.register(new URL("../cache-sw.mjs", import.meta.url))
