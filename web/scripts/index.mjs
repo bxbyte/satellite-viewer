@@ -1,17 +1,15 @@
-import { SatellitesCanvas } from "./canvas/index.mjs";
-import { SearchForm } from "./form/index.mjs";
-import { getElement } from "./utils.mjs";
-import { defaultSatellites } from "./satellite.mjs";
+import { SatellitesCanvas } from "./canvas/index.mjs"
+import { NavigationHandler } from "./nav/index.mjs"
+import { defaultSatellites } from "./satellite.mjs"
 
 function main() {
-  const satelliteCanvas = new SatellitesCanvas(getElement("#cvs"));
-  const form = new SearchForm(getElement("nav>form"));
+	const satelliteCanvas = new SatellitesCanvas()
+	satelliteCanvas.satellites = defaultSatellites
 
-  satelliteCanvas.satellites = defaultSatellites;
-  form.onresults = async (satellites) =>
-    (satelliteCanvas.satellites = satellites);
+	const nav = new NavigationHandler()
+	nav.onresults = async (satellites) => (satelliteCanvas.satellites = satellites)
 }
 
 // Run main
-if (document.readyState === "complete") main();
-else addEventListener("DOMContentLoaded", main);
+if (document.readyState === "complete") main()
+else addEventListener("DOMContentLoaded", main)

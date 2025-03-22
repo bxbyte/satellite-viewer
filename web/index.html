@@ -1,62 +1,59 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Satellite visualizer</title>
-    <script src="./scripts/cache.mjs" type="module" async></script>
-    <script src="./scripts/index.mjs" type="module" async></script>
-    <link rel="stylesheet" href="./styles/index.css" />
-  </head>
-  <body>
-    <main>
-      <canvas id="cvs">Your browser doesn't support the Webgl2 API</canvas>
-      <nav>
-        <form>
-          <div aria-label="URL">
-            <input name="url" type="text" placeholder="URL" readonly />
-            <button name="bookmark" type="button"></button>
-            <button name="bookmark-list" type="button"></button>
-          </div>
-          <div aria-label="API Source">
-            <select name="apiName" required>
-              <option hidden value="">API Source</option>
-            </select>
-            <button type="submit">Search</button>
-          </div>
-          <output name="options" aria-label="API Options">
-            <ul></ul>
-            <button name="add-option" type="button">Add option</button>
-          </output>
-          <output name="results" aria-label class="box">
-            <ul></ul>
-          </output>
-        </form>
-        <div>
-          <h1>Satellite Viewer</h1>
-          <p>
-            Display calculated satellite coordinates at a given time T, based on
-            2LE data from both
-            <a href="https://celestrak.org/">Celestrak</a> and the
-            <a href="https://tle.ivanstanojevic.me/">TLE API</a> APIs.
-            <br />
-            <br />
-            This is a little project made for a class at the
-            <a href="https://iut2.univ-grenoble-alpes.fr">IUT2</a>
-            of the
-            <a href="https://www.univ-grenoble-alpes.fr/">
-              University of Grenoble Alpes
-            </a>.
-          </p>
-        </div>
-        <dialog id="bookmarks">
-          <form method="dialog">
-            <h1>Bookmarks</h1>
-            <button></button>
-          </form>
-          <ul></ul>
-        </dialog>
-      </nav>
-    </main>
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Satellite visualizer</title>
+		<script src="./scripts/cache.mjs" type="module" async></script>
+		<script src="./scripts/index.mjs" type="module" async></script>
+		<link rel="stylesheet" href="./styles/index.css" />
+	</head>
+	<body>
+		<main>
+			<canvas>Your browser doesn't support the Webgl2 API</canvas>
+			<nav>
+				<dialog>
+					<form method="dialog">
+						<h1>Bookmarks</h1>
+						<button></button>
+					</form>
+					<ul></ul>
+				</dialog>
+				<form id="navigation">
+					<div aria-label="URL">
+						<input name="url" type="text" placeholder="URL" readonly />
+						<button name="toggle-bookmark" type="button" disabled></button>
+						<button name="open-bookmark" type="button"></button>
+					</div>
+					<div aria-label="API Source">
+						<select name="apiName" required>
+							<option hidden value="">API Source</option>
+						</select>
+						<button type="submit">Search</button>
+					</div>
+					<output name="options" aria-label="API Options">
+						<ul></ul>
+						<button name="add-option" type="button">Add option</button>
+					</output>
+					<output name="results" aria-label class="box">
+						<ul></ul>
+					</output>
+				</form>
+				<div>
+					<h1>Satellite Viewer</h1>
+					<p>
+						Display ECI coordinate from satellite 2LE at a given time T. Back with both the
+						<a href="https://celestrak.org/"> Celestrak </a> and
+						<a href="https://tle.ivanstanojevic.me/"> TLE API </a> APIs.
+						<br />
+						<br />
+						This is a little project made for a class at the
+						<a href="https://iut2.univ-grenoble-alpes.fr"> IUT2 </a>
+						of the
+						<a href="https://www.univ-grenoble-alpes.fr/"> University of Grenoble Alpes </a>.
+					</p>
+				</div>
+			</nav>
+		</main>
+	</body>
 </html>

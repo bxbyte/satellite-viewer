@@ -1,1 +1,1 @@
-export { SatellitesCanvas } from "./satellite-canvas.mjs";
+export { SatellitesCanvas } from "./satellite-canvas.mjs"
