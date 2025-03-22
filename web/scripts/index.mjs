@@ -1,7 +1,7 @@
 import { SatellitesCanvas } from "./canvas/index.mjs";
 import { SearchForm } from "./form/index.mjs";
 import { getElement } from "./utils.mjs";
-import { defaultSatellites } from "./api/index.mjs";
+import { defaultSatellites } from "./satellite.mjs";
 
 function main() {
   const satelliteCanvas = new SatellitesCanvas(getElement("#cvs"));

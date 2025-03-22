@@ -1,1 +1,1 @@
-export { SearchForm } from "./search-form.mjs";
+export { SearchForm } from "./form.mjs";

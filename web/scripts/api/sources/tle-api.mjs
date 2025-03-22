@@ -4,13 +4,17 @@ import { API } from "../api.mjs";
 export const TleApi = new API({
   name: "TLE API",
   entrypoint: new URL("https://tle.ivanstanojevic.me/api/tle"),
-  options: {
-    search: {
-      label: "Search by name",
-      default: true,
-      attrs: { type: "text", placeholder: "e.g. ISS" },
-    },
-  },
+  fields: [
+    {
+      label: 'Search by name',
+      selected: true,
+      field: {
+        name: "search",
+        type: "text",
+        placeholder: "e.g. ISS"
+      }
+    }
+  ],
   load: async (res) =>
     (await res.json()).member.map(({ line2, name }) => {
       const satellite = Satellite.from2LE(line2);

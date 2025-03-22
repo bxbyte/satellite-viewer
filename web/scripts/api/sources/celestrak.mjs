@@ -1,29 +1,47 @@
 import { Satellite } from "../../satellite.mjs";
 import { API } from "../api.mjs";
 
-const options = {
-  NAME: {
-    label: "Search by name",
-    default: true,
-    attrs: { type: "text", placeholder: "e.g ISS" },
+const fields = [
+  {
+    label: 'Search by name',
+    selected: true,
+    field: {
+      name: "NAME",
+      type: "text",
+      placeholder: "e.g ISS",
+    }
   },
-  CATNR: {
-    label: "Catalog Number",
-    attrs: { type: "text", pattern: "\\d{1,9}", placeholder: "XXXXXXXXX" },
+  {
+    label: 'Catalog Number',
+    field: {
+      name: "CATNR",
+      type: "text",
+      pattern: "\\d{1,9}",
+      placeholder: "XXXXXXXXX"
+    }
   },
-  INTDES: {
-    label: "International Designator",
-    attrs: { type: "text", pattern: "\\d{4}-\\w{3}", placeholder: "yyyy-nnn" },
+  {
+    label: 'International Designator',
+    field: {
+      name: "INTDES",
+      type: "text",
+      pattern: "\\d{4}-\\w{3}",
+      placeholder: "yyyy-nnn"
+    }
   },
-  SPECIAL: {
-    label: "Special data set",
-    values: {
-      GPZ: "GEO Protected Zone",
-      "GPZ-PLUS": "GEO Protected Zone +",
-      DECAYING: "Potential Decays",
-    },
-  },
-};
+  {
+    label: 'Special data set',
+    field: {
+      name: "SPECIAL",
+      label: 'E.g. GEO Protected Zone',
+      values: [
+        { value: 'GPZ', label: 'GEO Protected Zone' },
+        { value: 'GPZ-PLUS', label: 'GEO Protected Zone +' },
+        { value: 'DECAYING', label: 'Potential Decays' }
+      ]
+    }
+  }
+];
 
 const defaultParams = {
   FORMAT: "TLE",
@@ -36,13 +54,16 @@ export const CelestrakGPApi = new API({
   entrypoint: new URL("https://celestrak.org/NORAD/elements/gp.php"),
   defaultParams,
   load,
-  options: {
-    ...options,
-    GROUP: {
-      label: "Group",
-      attrs: { type: "text", placeholder: "" },
-    },
-  },
+  fields: [
+    ...fields,
+    {
+      label: 'Group',
+      field: {
+        name: "GROUP",
+        type: "text"
+      }
+    }
+  ],
   defaultOption: "NAME",
 });
 
@@ -53,39 +74,45 @@ export const CelestrakSubGPApi = new API({
   ),
   defaultParams,
   load,
-  options: {
-    ...options,
-    SOURCE: {
-      label: "Source",
-      values: {
-        "AST-E": "AST SpaceMobile Ephemeris",
-        CPF: "Consolidated Laser Ranging Predictions",
-        "CSS-E": "CSS Ephemeris",
-        "GLONASS-RE": "GLONASS Rapid Ephemeris",
-        "GPS-A": "GPS Almanac",
-        "GPS-E": "GPS Ephemeris",
-        "Intelsat-11P": "Intelsat 11-Parameter Data",
-        "Intelsat-E": "Intelsat Ephemeris",
-        "Iridium-E": "Iridium Ephemeris",
-        "ISS-E": "ISS Ephemeris",
-        "ISS-TLE": "ISS TLE [legacy data]",
-        "Kuiper-E": "Kuiper Ephemeris",
-        "METEOSAT-SV": "METEOSAT State Vector",
-        "OneWeb-E": "OneWeb Ephemeris",
-        "Orbcomm-TLE": "Orbcomm-Provided SupTLE",
-        "Planet-E": "Planet Ephemeris",
-        "SES-11P": "SES 11-Parameter Data",
-        "SES-E": "SES Ephemeris",
-        "SpaceX-E": "SpaceX Ephemeris",
-        "SpaceX-SV": "SpaceX State Vectors",
-        "Telesat-E": "Telesat Ephemeris",
-        "Transporter-SV": "Transporter State Vectors",
-        "Bandwagon-SV": "Bandwagon State Vectors",
-      },
+  fields: [
+    ...fields,
+    {
+      label: 'Source',
+      field: {
+        name: "SOURCE",
+        values: [
+          { value: 'AST-E', label: 'AST SpaceMobile Ephemeris' },
+          { value: 'CPF', label: 'Consolidated Laser Ranging Predictions' },
+          { value: 'CSS-E', label: 'CSS Ephemeris' },
+          { value: 'GLONASS-RE', label: 'GLONASS Rapid Ephemeris' },
+          { value: 'GPS-A', label: 'GPS Almanac' },
+          { value: 'GPS-E', label: 'GPS Ephemeris' },
+          { value: 'Intelsat-11P', label: 'Intelsat 11-Parameter Data' },
+          { value: 'Intelsat-E', label: 'Intelsat Ephemeris' },
+          { value: 'Iridium-E', label: 'Iridium Ephemeris' },
+          { value: 'ISS-E', label: 'ISS Ephemeris' },
+          { value: 'ISS-TLE', label: 'ISS TLE [legacy data]' },
+          { value: 'Kuiper-E', label: 'Kuiper Ephemeris' },
+          { value: 'METEOSAT-SV', label: 'METEOSAT State Vector' },
+          { value: 'OneWeb-E', label: 'OneWeb Ephemeris' },
+          { value: 'Orbcomm-TLE', label: 'Orbcomm-Provided SupTLE' },
+          { value: 'Planet-E', label: 'Planet Ephemeris' },
+          { value: 'SES-11P', label: 'SES 11-Parameter Data' },
+          { value: 'SES-E', label: 'SES Ephemeris' },
+          { value: 'SpaceX-E', label: 'SpaceX Ephemeris' },
+          { value: 'SpaceX-SV', label: 'SpaceX State Vectors' },
+          { value: 'Telesat-E', label: 'Telesat Ephemeris' },
+          { value: 'Transporter-SV', label: 'Transporter State Vectors' },
+          { value: 'Bandwagon-SV', label: 'Bandwagon State Vectors' }
+        ]
+      }
     },
-    FILE: {
-      label: "File",
-      attrs: { type: "text" },
-    },
-  },
+    {
+      label: 'File',
+      field: {
+        name: "FILE",
+        type: "text"
+      }
+    }
+  ]
 });

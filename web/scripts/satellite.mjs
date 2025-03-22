@@ -95,3 +95,9 @@ export class Satellite {
     return satellites;
   }
 }
+
+/** Pre-transformed binary satellites ( @see /celestrak-pipe.mjs ) */
+export const defaultSatellites = await (async () => {
+  const res = await fetch(new URL("../data/satellites.bin", import.meta.url));
+  return Satellite.collectionFromBuffer(await res.arrayBuffer());
+})();
