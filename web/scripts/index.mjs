@@ -5,7 +5,7 @@ import { defaultSatellites } from "./satellite.mjs";
 
 function main() {
   const satelliteCanvas = new SatellitesCanvas(getElement("#cvs"));
-  const form = new SearchForm(getElement("form"));
+  const form = new SearchForm(getElement("nav>form"));
 
   satelliteCanvas.satellites = defaultSatellites;
   form.onresults = async (satellites) =>

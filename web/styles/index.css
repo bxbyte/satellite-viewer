@@ -31,6 +31,11 @@ select {
   --svg-bookmark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M6.616 21q-.691 0-1.153-.462T5 19.385V4.615q0-.69.463-1.152T6.616 3h10.769q.69 0 1.153.463T19 4.616v14.769q0 .69-.462 1.153T17.384 21zm0-1h10.769q.23 0 .423-.192t.192-.424V4.616q0-.231-.192-.424T17.384 4H16v6.116l-2-1.193l-2 1.193V4H6.616q-.231 0-.424.192T6 4.615v14.77q0 .23.192.423t.423.192M6 20V4zm6-9.885l2-1.192l2 1.192l-2-1.192z'/%3E%3C/svg%3E");
   --svg-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='m8 10.207l3.854-3.853l-.707-.708L8 8.793L4.854 5.646l-.708.708z' clip-rule='evenodd'/%3E%3C/svg%3E");
   --svg-up: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='m8 5.293l3.854 3.853l-.707.708L8 6.707L4.854 9.854l-.708-.708z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  --svg-star-dashed: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M22.1 21.5L2.4 1.7L1.1 3l5.8 5.8l-4.9.4L7.5 14l-1.6 7l6.2-3.7l6.2 3.7l-.3-1.2l2.9 2.9zm-6.3-3.8L12 15.4l-3.8 2.3l1-4.3l-3.3-2.9l2.5-.2zM11.2 8L10 6.8L12 2l2.8 6.6l7.2.6l-5.1 4.4l-1.1-1.1l2.4-2l-4.4-.4l-1.7-4z'/%3E%3C/svg%3E");
+  --svg-star-outline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m12 15.39l-3.76 2.27l.99-4.28l-3.32-2.88l4.38-.37L12 6.09l1.71 4.04l4.38.37l-3.32 2.88l.99 4.28M22 9.24l-7.19-.61L12 2L9.19 8.63L2 9.24l5.45 4.73L5.82 21L12 17.27L18.18 21l-1.64-7.03z'/%3E%3C/svg%3E");
+  --svg-star-fill:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2L9.19 8.62L2 9.24l5.45 4.73L5.82 21z'/%3E%3C/svg%3E");
+  --svg-close: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z'/%3E%3C/svg%3E");
+  --svg-star-list: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Cpath fill='%23000' d='M32 64a8 8 0 0 1 8-8h176a8 8 0 0 1 0 16H40a8 8 0 0 1-8-8m8 72h56a8 8 0 0 0 0-16H40a8 8 0 0 0 0 16m72 48H40a8 8 0 0 0 0 16h72a8 8 0 0 0 0-16m125.09-40.22l-22.52 18.59l6.86 27.71a8 8 0 0 1-11.82 8.81L184 183.82l-25.61 15.07a8 8 0 0 1-11.82-8.81l6.85-27.71l-22.51-18.59a8 8 0 0 1 4.47-14.14l29.84-2.31l11.43-26.5a8 8 0 0 1 14.7 0l11.43 26.5l29.84 2.31a8 8 0 0 1 4.47 14.14m-25.47.28l-14.89-1.15a8 8 0 0 1-6.73-4.8l-6-13.92l-6 13.92a8 8 0 0 1-6.73 4.8l-14.89 1.15l11.11 9.18a8 8 0 0 1 2.68 8.09l-3.5 14.12l13.27-7.81a8 8 0 0 1 8.12 0l13.27 7.81l-3.5-14.12a8 8 0 0 1 2.68-8.09Z'/%3E%3C/svg%3E");
 }
 
 * {
@@ -53,6 +58,8 @@ select {
 }
 
 input {
+  width: 100%;
+
   /* Fix autocomplete horride color */
   &:-webkit-autofill,
   &:-webkit-autofill:focus {
@@ -75,6 +82,7 @@ input {
 
 button,
 select {
+  cursor: pointer;
   display: inline-flex;
   white-space: pre;
   align-items: center;
@@ -96,12 +104,15 @@ form:invalid [type="submit"] {
 }
 
 input,
-button,
 select,
+button,
 .box {
   padding: 0.4em 0.8em;
-  background: var(--color-dark-0);
   border-radius: 0.5em;
+}
+
+input, select, .box {
+  background: var(--color-dark-0);
 }
 
 ::placeholder,
@@ -202,9 +213,8 @@ form {
     gap: 0.5em;
   }
 
-  :not(li) > button {
+  button:not(:empty) {
     color: var(--color-dark-0);
-    margin-top: auto;
     background: var(--color-light-0);
     width: fit-content;
 
@@ -219,6 +229,24 @@ form {
       &::after {
         mask-image: var(--svg-add);
       }
+    }
+  }
+
+  [name=url] ~ button {
+    background: var(--color-dark-2);
+    
+    &[name=bookmark] {
+      &::after {
+        mask-image: var(--svg-star-outline);
+      }
+
+      &.bookmarked::after {
+        mask-image: var(--svg-star-fill);
+      }
+    }
+
+    &[name=bookmark-list]::after {
+      mask-image: var(--svg-star-list);
     }
   }
 
@@ -303,5 +331,93 @@ form {
 
   &.loading {
     --svg-search: var(--svg-load);
+  }
+}
+
+dialog {
+  --border: 1px solid var(--color-dark-2);
+  --padx: 1rem;
+  --spacex: .5rem;
+  --spacey: .4rem;
+
+  margin: auto;
+  border: var(--border);
+  background-color: color-mix(in srgb, var(--color-dark-1), transparent 5%);
+  padding: .5rem 0;
+  border-radius: .5rem;
+  max-width: 80%;
+  display: flex;
+  gap: 1em;
+  visibility: hidden;
+
+  &:modal {
+    visibility: visible;
+  }
+
+  button {
+    padding: 0;
+  }
+
+  form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+    padding: 0 var(--padx);
+
+    button::after {
+      mask-image: var(--svg-close);
+    }
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    border-radius: .5rem;
+    padding: 0 var(--spacex);
+    gap: calc(var(--spacey) * 2);
+
+    &:empty::before {
+      content: 'No bookmarks found';
+      padding: calc(var(--padx) - var(--spacex));
+    }
+
+    button {
+      background: none;
+      
+      &::after {
+        mask-image: var(--svg-star-dashed);
+        color: var(--color-red-0)
+      }
+    }
+
+    li {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: calc(var(--padx) - var(--spacex));
+      gap: 1rem;
+      cursor: pointer;
+      position: relative;
+      border-radius: .4rem;
+
+      &:not(:first-child)::before {
+        position: absolute;
+        bottom: calc(100% + var(--spacey) - 1px);
+        left: 0;
+        content: '';
+        width: 100%;
+        border-top: var(--border);
+      }
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--color-dark-2), transparent 50%);
+      }
+    }
+  }
+
+  &::backdrop {
+    backdrop-filter: blur(1em) brightness(.75);
   }
 }

@@ -11,7 +11,7 @@ export const TleApi = new API({
       field: {
         name: "search",
         type: "text",
-        placeholder: "e.g. ISS"
+        placeholder: "e.g. ISS",
       }
     }
   ],

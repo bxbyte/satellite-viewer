@@ -78,7 +78,7 @@ function createField(field) {
 }
 
 /**
- * @typedef {FieldBase & { groupName: string, name: string, value: string, fieldGroup: Set<number>, fields: (FieldBase & { field: Parameters<typeof createField>[0][] })[]}} NamedFields
+ * @typedef {FieldBase & { groupName: string, name: string, value: string, fieldGroup: Set<number>, fields: (FieldBase & { field: Parameters<typeof createField>[0] })[]}} NamedFields
  * @param {NamedFields} field 
  */
 export function createNamedFields({
@@ -90,7 +90,7 @@ export function createNamedFields({
 }) {
   const fieldNameEl = createSelectField({
     label,
-    value: fields.findIndex(f => f.field.name == name)
+    value: fields.findIndex(f => f.field.name == name),
   });
 
   function setNames() {
@@ -119,7 +119,7 @@ export function createNamedFields({
     return createField({
       name: `${groupName}.${name}`,
       ...field,
-      ...args
+      ...args,
     })
   };
 

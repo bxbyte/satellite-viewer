@@ -1,6 +1,7 @@
 import { throttleFn, getElement } from "../utils.mjs";
 import { createNamedFields, createEl } from "./fields.mjs";
 import { APIs, defaultAPI, matchAPIFromUrl } from "../api/index.mjs";
+import { bookmarks } from "../bookmark.mjs";
 
 export class SearchForm {
   /**
@@ -23,6 +24,41 @@ export class SearchForm {
       ),
     );
     apiNameEl.addEventListener("input", () => this.updAPI());
+
+    this.bookmarkEl = this.#getFieldEl("bookmark");
+    this.bookmarkEl.addEventListener("click", () => {
+      this.isBookmared = bookmarks.toggle(this.data.url)
+    })
+
+    /**
+     * @type {HTMLDialogElement}
+     */
+    const bookmarkDialog = getElement("#bookmarks"),
+      bookmarksEl = getElement("ul", bookmarkDialog)
+
+    // Remove bookmark rows on close
+    bookmarkDialog.addEventListener("close", () => bookmarksEl.innerHTML = '')
+
+    this.#getFieldEl("bookmark-list")
+      .addEventListener("click", () => {
+        const rows = [...bookmarks.bookmarks].map(url => {
+          const row = document.createElement("li")
+          row.textContent = url
+          const removeButton = row.appendChild(document.createElement("button"))
+          removeButton.addEventListener("click", (ev) => {
+            bookmarks.delete(url)
+            row.remove()
+            ev.stopPropagation()
+          })
+          row.addEventListener("click", () => {
+            this.updFromURL(url);
+            bookmarkDialog.close()
+          })
+          return row
+        })
+        bookmarksEl.append(...rows)
+        bookmarkDialog.showModal()
+      })
 
     this.addFieldEl = this.#getFieldEl("add-option");
     this.addFieldEl.addEventListener("click", () => {
@@ -50,8 +86,10 @@ export class SearchForm {
   }
 
   updURL() {
-    const { params = {} } = this.data;
-    this.urlInputEl.value = this.api.buildURL(params);
+    const url = this.api.buildURL(this.data.params);
+    this.bookmarkEl.disabled = url.toString() == this.api.entrypoint.toString()
+    this.isBookmared = bookmarks.has(url)
+    this.urlInputEl.value = url
     this.urlInputEl.scrollTo({ left: this.urlInputEl.scrollWidth });
   }
 
@@ -74,9 +112,10 @@ export class SearchForm {
 
   /**
    * 
-   * @param {URL} url 
+   * @param {URL | string} url 
    */
   updFromURL(url) {
+    url = new URL(url)
     const api = matchAPIFromUrl(url)
     if (!api) throw new Error("URL doesn't match any API")
     this.api = api
@@ -150,12 +189,9 @@ export class SearchForm {
    */
   set onresults(callback) {
     const search = throttleFn(async () => {
-      const { url } = this.data;
-      if (!url) return;
-
       // API call
       this.isLoading = true;
-      const satellites = await this.api.search(url);
+      const satellites = await this.api.search(this.data.url);
       this.isLoading = false;
 
       // Update view
@@ -180,6 +216,14 @@ export class SearchForm {
    */
   set isLoading(isLoading) {
     this.formEl.classList.toggle("loading", isLoading);
+  }
+
+  /**
+   *
+   * @param {boolean} isBookmared
+   */
+  set isBookmared(isBookmared) {
+    this.bookmarkEl.classList.toggle("bookmarked", isBookmared);
   }
 
   /**

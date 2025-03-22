@@ -15,6 +15,8 @@
         <form>
           <div aria-label="URL">
             <input name="url" type="text" placeholder="URL" readonly />
+            <button name="bookmark" type="button"></button>
+            <button name="bookmark-list" type="button"></button>
           </div>
           <div aria-label="API Source">
             <select name="apiName" required>
@@ -24,7 +26,7 @@
           </div>
           <output name="options" aria-label="API Options">
             <ul></ul>
-            <button type="button" name="add-option">Add option</button>
+            <button name="add-option" type="button">Add option</button>
           </output>
           <output name="results" aria-label class="box">
             <ul></ul>
@@ -47,6 +49,13 @@
             </a>.
           </p>
         </div>
+        <dialog id="bookmarks">
+          <form method="dialog">
+            <h1>Bookmarks</h1>
+            <button></button>
+          </form>
+          <ul></ul>
+        </dialog>
       </nav>
     </main>
   </body>

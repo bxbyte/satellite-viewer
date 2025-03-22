@@ -32,7 +32,7 @@ export class API {
    *
    * @param {*} params
    */
-  buildURL(params) {
+  buildURL(params = {}) {
     const url = new URL(this.entrypoint);
     Object.entries(params).forEach(([k, v]) => {
       if (v != "") url.searchParams.set(k, v);
