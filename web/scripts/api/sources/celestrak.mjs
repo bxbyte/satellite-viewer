@@ -4,7 +4,6 @@ import { API } from "../api.mjs";
 const fields = [
   {
     label: 'Search by name',
-    selected: true,
     field: {
       name: "NAME",
       type: "text",
@@ -54,6 +53,7 @@ export const CelestrakGPApi = new API({
   entrypoint: new URL("https://celestrak.org/NORAD/elements/gp.php"),
   defaultParams,
   load,
+  defaultField: 'NAME',
   fields: [
     ...fields,
     {
@@ -74,6 +74,7 @@ export const CelestrakSubGPApi = new API({
   ),
   defaultParams,
   load,
+  defaultField: 'NAME',
   fields: [
     ...fields,
     {

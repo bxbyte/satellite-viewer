@@ -1,6 +1,6 @@
 import { throttleFn, getElement } from "../utils.mjs";
 import { createNamedFields, createEl } from "./fields.mjs";
-import { APIs, defaultAPI } from "../api/index.mjs";
+import { APIs, defaultAPI, matchAPIFromUrl } from "../api/index.mjs";
 
 export class SearchForm {
   /**
@@ -9,7 +9,6 @@ export class SearchForm {
    */
   constructor(formEl) {
     this.api = defaultAPI;
-    this.apiUsedFields = new Set()
     this.formEl = formEl;
 
     this.fieldsEl = this.#getFieldEl("options", true);
@@ -32,7 +31,8 @@ export class SearchForm {
 
     this.formEl.addEventListener("input", () => this.updURL());
 
-    this.rstFields();
+    this.addField(this.api.defaultField);
+    this.updURL();
   }
 
   /**
@@ -56,15 +56,11 @@ export class SearchForm {
   }
 
   updFieldsCount() {
-    this.addFieldEl.disabled = this.apiUsedFields.size >= this.api.fields.length;
+    this.addFieldEl.disabled = this.addFieldEl.childElementCount >= this.api.fields.length;
   }
 
   rstFields() {
     this.fieldsEl.innerHTML = "";
-    this.apiUsedFields = new Set()
-    this.addField();
-    this.updFieldsCount();
-    this.updURL();
   }
 
   updAPI() {
@@ -72,16 +68,41 @@ export class SearchForm {
     if (this.api.name == apiName) return;
     this.api = APIs[apiName];
     this.rstFields();
+    this.addField(this.api.defaultField);
+    this.updURL();
   }
 
-  addField() {
+  /**
+   * 
+   * @param {URL} url 
+   */
+  updFromURL(url) {
+    const api = matchAPIFromUrl(url)
+    if (!api) throw new Error("URL doesn't match any API")
+    this.api = api
+    this.rstFields()
+    url.searchParams.forEach((v, k) => {
+      if (api.entrypoint.searchParams.has(k)) return
+      this.addField(k, v)
+    })
+    this.updURL()
+  }
+
+  /**
+   * 
+   * @param {string?} name 
+   * @param {string?} value 
+   * @returns 
+   */
+  addField(name, value) {
     const fieldRow = document.createElement("li");
     
     let { fieldInputEl, fieldNameEl } = createNamedFields({
       label: "Select API options",
       groupName: "params",
-      fieldGroup: this.apiUsedFields,
-      fields: this.api.fields
+      fields: this.api.fields,
+      name,
+      value,
     })
 
     // Update url when field change
@@ -101,6 +122,8 @@ export class SearchForm {
     fieldRow.append(fieldNameEl, optRemoveBtnEl, fieldInputEl)
     this.fieldsEl.appendChild(fieldRow)
     this.updFieldsCount()
+
+    return fieldRow
   }
 
   /**

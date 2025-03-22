@@ -5,16 +5,18 @@ export class API {
    *  entrypoint: URL,
    *  load: (res: Response) => Promise<Satellite[]>
    *  defaultParams: Record<string, string>
+   *  defaultField: string
    *  fields: import("../form/fields.mjs").NamedFields['fields']
    * }}
    */
-  constructor({ name, entrypoint, fields, load, defaultParams = {} }) {
+  constructor({ name, entrypoint, defaultField, fields, load, defaultParams = {} }) {
     this.name = name;
     this.entrypoint = entrypoint;
     Object.entries(defaultParams).forEach(([k, v]) =>
       this.entrypoint.searchParams.set(k, v),
     );
     this.load = load;
+    this.defaultField = defaultField
     this.fields = fields;
   }
 

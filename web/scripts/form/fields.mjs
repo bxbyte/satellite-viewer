@@ -4,7 +4,7 @@
 
 /**
  * @template {keyof HTMLElementTagNameMap} T
- * @typedef {FieldBase & { name: string } & HTMLElementTagNameMap[T]} Field
+ * @typedef {FieldBase & { name: string, value?: string } & HTMLElementTagNameMap[T]} Field
  */
 
 /**
@@ -15,18 +15,23 @@
  */
 export function createEl(type, params) {
   const el = document.createElement(type);
-  Object.entries(params).forEach(([k, v]) => el[k] = v)
+  Object.entries(params).filter(([k, v]) => v != undefined).forEach(([k, v]) => el[k] = v)
   return el
 }
 
 /**
- * @typedef {FieldBase & { value: string, selected: boolean }} SelectFieldValue
+ * @typedef {FieldBase & { value: string }} SelectFieldValue
  * @typedef {Field<'select'> & { values: SelectFieldValue[] }} SelectField
  * 
  * @param {SelectField} field
  * @returns {HTMLSelectElement & { setValues: (values: SelectFieldValue[]) => void }}
  */
-export function createSelectField({label, values, ...field}) {
+export function createSelectField({
+  label,
+  value: defaultValue, 
+  values,
+  ...field
+}) {
   const el = createEl("select", { required: true, ...field })
 
   const valuePlaceholder = new Option(label, "", true);
@@ -41,8 +46,8 @@ export function createSelectField({label, values, ...field}) {
       valuePlaceholder,
       ...el.selectedOptions,
       ...values.map(
-          ({label, value, selected}) =>
-          new Option(label, value, false, selected),
+          ({label, value}) =>
+          new Option(label, value, false, value == defaultValue),
       ),
     );
   };
@@ -58,7 +63,8 @@ export function createSelectField({label, values, ...field}) {
  * @param {Field<'input'>} field 
  */
 export function createInputField(field) {
-  return createEl("input", { required: true, ...field })
+  const inputEl = createEl("input", { required: true, ...field })
+  return inputEl
 }
 
 /**
@@ -72,57 +78,67 @@ function createField(field) {
 }
 
 /**
- * @typedef {FieldBase & { groupName: string, fieldGroup: Set<number>, fields: FieldBase & { field: Parameters<typeof createField>[0][] }}} NamedFields
+ * @typedef {FieldBase & { groupName: string, name: string, value: string, fieldGroup: Set<number>, fields: (FieldBase & { field: Parameters<typeof createField>[0][] })[]}} NamedFields
  * @param {NamedFields} field 
  */
-export function createNamedFields({label, groupName, fieldGroup = new Set(), fields}) {
-  const fieldNameEl = createSelectField({ label });
+export function createNamedFields({
+  label,
+  groupName,
+  name,
+  value,
+  fields
+}) {
+  const fieldNameEl = createSelectField({
+    label,
+    value: fields.findIndex(f => f.field.name == name)
+  });
 
-  const setNames = () => {
+  function setNames() {
     fieldNameEl.setValues(
       fields
         .map(({field, ...attrs}, i) => ({
           ...attrs,
-          value: i
+          value: i,
+          used: fieldNameEl.form && new FormData(fieldNameEl.form).has(`${groupName}.${field.name}`)
         }))
-        .filter((_, i) => !fieldGroup.has(i))
+        .filter(({used}) => !used)
       )
   };
 
-  // Placeholder before choosing option
-  let fieldNameValue,
-    fieldInputEl = createInputField({
+  setNames();
+  fieldNameEl.addEventListener("focus", setNames, true);
+
+  /**
+   * 
+   * @param {Parameters<typeof createField>?} args 
+   * @returns 
+   */
+  function getNewField(args) {
+    // Update input field
+    const { field: {name, ...field} } = fields[fieldNameEl.value];
+    return createField({
+      name: `${groupName}.${name}`,
+      ...field,
+      ...args
+    })
+  };
+
+  let fieldInputEl = 
+    fields[fieldNameEl.value]
+    ? getNewField({ value })
+    : createInputField({ // Placeholder
       disabled: true,
       placeholder: "Option value",
     });
 
-  const setField = () => {
-    if (!fieldNameEl.value) return;
-
-    // Update input field
-    const { field: {name, ...field} } = fields[fieldNameEl.value];
-    const newFieldEl = createField({
-      name: `${groupName}.${name}`,
-      ...field,
-    })
-    fieldInputEl.replaceWith(newFieldEl);
-    fieldInputEl = newFieldEl;
-    
-    // Update group
-    fieldGroup.delete(fieldNameValue)
-    fieldNameValue = parseInt(fieldNameEl.value)
-    fieldGroup.add(fieldNameValue)
-  };
-
-  fieldNameEl.addEventListener("focus", setNames, true);
-  fieldNameEl.addEventListener("change", setField, true);
-
   // Set defaults
-  setNames();
-  setField()
+  fieldNameEl.addEventListener("change", () => {
+    const newFieldEl = getNewField()
+    fieldInputEl.replaceWith(newFieldEl)
+    fieldInputEl = newFieldEl
+  }, true);
 
   return {
-    fieldGroup,
     fieldNameEl,
     fieldInputEl
   }
