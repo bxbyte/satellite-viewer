@@ -1,5 +1,5 @@
-import { Satellite } from "../satellite.mjs";
-import { API } from "./api.mjs";
+import { Satellite } from "../../satellite.mjs";
+import { API } from "../api.mjs";
 
 const options = {
   NAME: {

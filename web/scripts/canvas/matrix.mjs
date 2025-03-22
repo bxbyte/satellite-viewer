@@ -8,15 +8,15 @@ export class M4x4 extends Array {
       1,
       0,
       0,
-      0, //
-      0,
-      1,
-      0,
-      0, //
       0,
       0,
       1,
-      0, //
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
       0,
       0,
       0,
@@ -38,15 +38,15 @@ export class M4x4 extends Array {
       0.5 / ang,
       0,
       0,
-      0, //
+      0,
       0,
       (0.5 * a) / ang,
       0,
-      0, //
+      0,
       0,
       0,
       -(zMax + zMin) / (zMax - zMin),
-      -1, //
+      -1,
       0,
       0,
       (-2 * zMax * zMin) / (zMax - zMin),
