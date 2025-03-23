@@ -20,8 +20,8 @@ in float argumentOfPerigee;
 in float meanAnomaly;
 in float meanMotion;
 
-// Satellites selection color
-in float group;
+// Satellites color
+in vec3 color;
 
 // Displayed point information
 out vec4 ptColor;
@@ -62,6 +62,6 @@ vec3 computeECI() {
 void main() {
   gl_PointSize = 5.;
   gl_Position = ctrl.projection * ctrl.view * ctrl.motion * vec4(computeECI(), 1.0);
-  ptColor = vec4(1, vec2(group), 1);
+  ptColor = vec4(color, 1);
   ptPosition = ctrl.resolution * ((gl_Position.xy / gl_Position.w) * .5 + .5);
 }

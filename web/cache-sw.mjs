@@ -1,13 +1,17 @@
-const MAX_CACHED_LIVE = 3 * 60 * 60 * 1e3 // 3h hours max live
+/** Maximum cached live duration (3h) */
+const MAX_CACHED_LIVE = 3 * 60 * 60 * 1e3
 
-function getCurrentHour() {
+/** Get current time rounded with @see MAX_CACHED_LIVE */
+function getCacheTime() {
 	return Math.floor(Date.now() / MAX_CACHED_LIVE) * MAX_CACHED_LIVE
 }
 
+/** Clean cache storage (remove dead cache) */
 async function cleanCache() {
-	return Promise.all((await caches.keys()).filter((k) => getCurrentHour() > parseInt(k)).map((k) => caches.delete(k)))
+	return Promise.all((await caches.keys()).filter((k) => getCacheTime() > parseInt(k)).map((k) => caches.delete(k)))
 }
 
+// Setup worker
 addEventListener("activate", (ev) => {
 	// Take control of the current window
 	ev.waitUntil(clients.claim())
@@ -20,7 +24,7 @@ addEventListener("activate", (ev) => {
 addEventListener("fetch", (ev) =>
 	ev.respondWith(
 		(async () => {
-			const cache = await caches.open(getCurrentHour())
+			const cache = await caches.open(getCacheTime())
 			let res = await cache.match(ev.request)
 
 			if (!res) {

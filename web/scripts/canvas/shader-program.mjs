@@ -4,10 +4,11 @@ export class ShaderProgram {
 	#shaderProgram
 
 	/**
-	 *
-	 * @param {WebGL2RenderingContext} gl
-	 * @param {string} fragShaderCode
-	 * @param {string} vertShaderCode
+	 * A shader program assembling fragment and vertex shaders code
+	 *  
+	 * @param {WebGL2RenderingContext} gl WebGL2 rendering context
+	 * @param {string} fragShaderCode Fragment shader code
+	 * @param {string} vertShaderCode Vertex shader code
 	 */
 	constructor(gl, fragShaderCode, vertShaderCode) {
 		this.gl = gl
@@ -33,17 +34,20 @@ export class ShaderProgram {
 		}
 	}
 
+	/** Use this program in the WebGL rendering context. */
 	use() {
 		this.gl.useProgram(this.#shaderProgram)
 	}
 
 	/**
-	 *
+	 * Get uniform attribute setter
+	 * 
 	 * @typedef {Extract<keyof WebGL2RenderingContext, `uniform${string}`>} UniformKeys
 	 * @typedef {UniformKeys extends `uniform${infer U}` ? U : never} UniformTypes
 	 *
-	 * @param {string} name
-	 * @param {UniformTypes} type
+	 * @param {string} name Attribute name
+	 * @param {UniformTypes} type Attribute type
+	 * @returns Setter
 	 */
 	getUniformSetter(name, type) {
 		const setter = this.gl[`uniform${type}`].bind(this.gl),
@@ -52,24 +56,25 @@ export class ShaderProgram {
 	}
 
 	/**
-	 *
-	 * @param {string} name
-	 * @param {Omit<Parameters<WebGL2RenderingContext['vertexAttribPointer']>, 0>} pointerParams
+	 * Get buffer attribute location
+	 * @param {string} name Attribute name
+	 * @param {Omit<Parameters<WebGL2RenderingContext['vertexAttribPointer']>, 0>} attrParams Attribute params
+	 * @returns {WebGLBuffer} Buffer
 	 */
-	getBuffer(name, ...pointerParams) {
+	getBuffer(name, ...attrParams) {
 		const buffer = notNull(this.gl.createBuffer(), "Can't create buffer")
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer)
 		const attrPointer = this.gl.getAttribLocation(this.#shaderProgram, name)
-		this.gl.vertexAttribPointer(attrPointer, ...pointerParams)
+		this.gl.vertexAttribPointer(attrPointer, ...attrParams)
 		this.gl.enableVertexAttribArray(attrPointer)
 		return buffer
 	}
 
 	/**
-	 *
-	 * @param {number} type
-	 * @param {string} code
-	 * @returns
+	 * Compile a webgl shader
+	 * @param {number} type Shader type
+	 * @param {string} code Shader source code
+	 * @returns {WebGLShader} Compiled shader
 	 */
 	#compileShader(type, code) {
 		const shader = notNull(this.gl.createShader(type), "Can't create shader")

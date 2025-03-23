@@ -9,12 +9,25 @@ const shadersCode = await Promise.all(
 )
 
 export class Scene {
-	/** @type {import("../satellite.mjs").Satellite[]} */
-	#satellites = []
-	#renderRequestId
+	/**
+	 * Current satellites
+	 * @type {import("../satellite.mjs").Satellite[]}
+	 */
+	#satellites
+
+	/**
+	 * Satellites color buffer
+	 * @type {Float32Array} 
+	 */
+	#satellitesColors
 
 	constructor() {
+		this.#satellites = []
+
+		/** Scene canvas */
 		this.cvs = getElement("canvas")
+
+		/** Rendering context */
 		this.gl = notNull(
 			this.cvs.getContext("webgl2", {
 				premultipliedAlpha: false, // Use alpha
@@ -24,9 +37,11 @@ export class Scene {
 			"Your browser doesn't support the Webgl2 API"
 		)
 
+		/** Shader program */
 		this.shader = new ShaderProgram(this.gl, ...shadersCode)
 		this.shader.use()
 
+		/** Scene controls */
 		this.controls = new SceneControls(this)
 		this.controls.view[14] = this.controls.view[14] - 15 // zoom
 		this.controls.updateView()
@@ -34,8 +49,7 @@ export class Scene {
 		this.controls.motion.rotateY(Math.PI / 4)
 		this.controls.updateMotion()
 
-		/** @type {(() => void)[]} */
-		this.satellitesBinds = SATELLITES_PARAMS.map((paramName) => {
+		const updateSatellitesParamsBuffers = SATELLITES_PARAMS.map((paramName) => {
 			const attrLocation = this.shader.getBuffer(paramName, 1, this.gl.FLOAT, false, 0, 0)
 			return () => {
 				this.gl.bindBuffer(this.gl.ARRAY_BUFFER, attrLocation)
@@ -46,30 +60,35 @@ export class Scene {
 				)
 			}
 		})
+		/** Update satellites params buffers (need to set satellites before) */
+		this.updateSatellitesParams = () => updateSatellitesParamsBuffers.forEach((b) => b())
+	
+		const colorLocation = this.shader.getBuffer("color", 3, this.gl.FLOAT, false, 0, 0)
+		/** Update satellites color buffer (need to set satellites before) */
+		this.updateColors = () => {
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorLocation)
+			this.gl.bufferData(this.gl.ARRAY_BUFFER, this.#satellitesColors, this.gl.STATIC_DRAW)
+		}
 
+		// Set render function
 		this.render((time, dt) => {
-			// viewMatrix.rotateY(dt / 1000)
-
-			// Enable the depth test
 			this.gl.enable(this.gl.DEPTH_TEST)
 			this.gl.depthFunc(this.gl.LEQUAL)
 
-			// // Clear canvas
 			this.gl.clearColor(0, 0, 0, 0)
 			this.gl.clearDepth(1)
 			this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
 
-			// Pass uniform data
 			this.controls.setTime(time)
 
-			// Draw the points
 			this.gl.drawArrays(this.gl.POINTS, 0, this.#satellites.length)
 		})
 	}
 
 	/**
-	 *
-	 * @param {(time: number, deltaTime: number) => void} callback
+	 * Set rendering function
+	 * @param {(time: number, deltaTime: number) => void} callback 
+	 * @param {number} maxFPS Max framerate
 	 */
 	render(callback, maxFPS = 120) {
 		const timeout = 1000 / maxFPS
@@ -80,31 +99,38 @@ export class Scene {
 				callback(time, deltaTime)
 				lastTime = time
 			}
-			this.#renderRequestId = requestAnimationFrame(frameCallback)
+			requestAnimationFrame(frameCallback)
 		}
-		this.#renderRequestId = requestAnimationFrame(frameCallback)
-	}
-
-	pause() {
-		cancelAnimationFrame(this.#renderRequestId)
+		requestAnimationFrame(frameCallback)
 	}
 
 	/**
-	 *
+	 * Set satellites points
 	 * @param {import("../satellite.mjs").Satellite[]} satellites
 	 */
 	set satellites(satellites) {
+		// Set satellites params
 		this.#satellites = satellites
-		this.satellitesBinds.forEach((b) => b())
+		this.updateSatellitesParams()
 
-		// TODO : rework the colors
-		const colorLocation = this.shader.getBuffer("group", 1, this.gl.UNSIGNED_BYTE, false, 0, 0)
-
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorLocation)
-		this.gl.bufferData(
-			this.gl.ARRAY_BUFFER,
-			new Uint8Array(this.#satellites.map(() => 1)),
-			this.gl.STATIC_DRAW
+		// Set color buffer
+		this.#satellitesColors = Float32Array.from(
+			{ length: satellites.length * 3 },
+			() => 1
 		)
+		this.updateColors()
+	}
+
+	/**
+	 * Set color of a specific satellite point
+	 * @param {number} idx Satellite index
+	 * @param {[number, number, number]} color Satellite rgb color
+	 */
+	setSatelliteColor(idx, color) {
+		idx *= 3
+		this.#satellitesColors[idx] = color[0]
+		this.#satellitesColors[idx + 1] = color[1]
+		this.#satellitesColors[idx + 2] = color[2]
+		this.updateColors()
 	}
 }

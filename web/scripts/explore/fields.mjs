@@ -10,6 +10,8 @@ import { createEl } from "../utils.mjs"
  */
 
 /**
+ * Create a select field
+ * 
  * @typedef {FieldBase & { value: string }} SelectFieldValue
  * @typedef {Field<'select'> & { values: SelectFieldValue[] }} SelectField
  *
@@ -40,7 +42,7 @@ export function createSelectField({ label, value: defaultValue, values, ...field
 }
 
 /**
- *
+ * Create input field
  * @param {Field<'input'>} field
  */
 export function createInputField(field) {
@@ -49,7 +51,7 @@ export function createInputField(field) {
 }
 
 /**
- *
+ * Create either an input or select field
  * @param {SelectField | Field<'input'>} field
  */
 function createField(field) {
@@ -57,6 +59,9 @@ function createField(field) {
 }
 
 /**
+ * Create a field pair of key-value:
+ * the key is defined in a select field and the value in a field depending on the key.
+ * 
  * @typedef {FieldBase & { groupName: string, name: string, value: string, fieldGroup: Set<number>, fields: (FieldBase & { field: Parameters<typeof createField>[0] })[]}} NamedFields
  * @param {NamedFields} field
  */
@@ -82,11 +87,10 @@ export function createNamedFields({ label, groupName, name, value, fields }) {
 	fieldNameEl.addEventListener("focus", setNames, true)
 
 	/**
-	 *
+	 * Create new field based on the selected named field
 	 * @param {Parameters<typeof createField>?} args
-	 * @returns
 	 */
-	function getNewField(args) {
+	function createNewField(args) {
 		// Update input field
 		const {
 			field: { name, ...field },
@@ -99,7 +103,7 @@ export function createNamedFields({ label, groupName, name, value, fields }) {
 	}
 
 	let fieldInputEl = fields[fieldNameEl.value]
-		? getNewField({ value })
+		? createNewField({ value })
 		: createInputField({
 				// Placeholder
 				disabled: true,
@@ -110,7 +114,7 @@ export function createNamedFields({ label, groupName, name, value, fields }) {
 	fieldNameEl.addEventListener(
 		"change",
 		() => {
-			const newFieldEl = getNewField()
+			const newFieldEl = createNewField()
 			fieldInputEl.replaceWith(newFieldEl)
 			fieldInputEl = newFieldEl
 		},

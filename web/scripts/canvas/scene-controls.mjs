@@ -2,10 +2,11 @@ import { M4x4 } from "./matrix.mjs"
 
 export class SceneControls {
     /**
-     * 
-     * @param {import("./scene.mjs").Scene} scene 
+     * Define scene control parameters, a.k.a projection, movements, ...   
+     * @param {import("./scene.mjs").Scene} scene Parent scene
      */
     constructor(scene) {
+        /** Parent scene */
         this.scene = scene
 
         /** @type {{x: number, y: number}?} */
@@ -34,15 +35,20 @@ export class SceneControls {
         this.resetCursor()
     }
 
-    /** @param {string} cursor */
+    /** 
+     * Set canvas cursor
+     * @param {string} cursor Cursor type
+     */
     set cursor(cursor) {
         this.scene.cvs.style.cursor = cursor
     }
 
+    /** Reset canvas cursor */
     resetCursor() {
         this.cursor = "grab"
     }
 
+    /** Update canvas aspect ratio */
     updAspectRatio() {
         this.scene.cvs.width = Math.floor(this.scene.cvs.clientWidth)
         this.scene.cvs.height = Math.floor(this.scene.cvs.clientHeight)
@@ -52,10 +58,12 @@ export class SceneControls {
         this.updateProjection()
     }
 
+    /** Auto set aspect ratio on canvas size change */
     #setAspectRatioAutoUpdate() {
 		new ResizeObserver(this.updAspectRatio.bind(this)).observe(this.scene.cvs)
     }
 
+    /** Set zoom control on wheel */
     #setZoomControl() {
 		let scrollEndId = 0; // Timeout id resetting on wheel event to detect wheel end
 		this.scene.cvs.addEventListener("wheel", (ev) => {
@@ -67,6 +75,7 @@ export class SceneControls {
 		})
     }
 
+    /** Set rotate control on grab */
     #setRotateControl() {
         // Init previous pointer to the point where the user start to click 
 		this.scene.cvs.addEventListener("pointerdown", (ev) => {

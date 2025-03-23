@@ -1,19 +1,22 @@
+/**
+ * Matrix of 4 by 4
+ */
 export class M4x4 extends Array {
 	/**
-	 *
-	 * @returns {M4x4}
+	 * Create identity matrix
+	 * @returns {M4x4} Identity matrix
 	 */
 	static identity() {
 		return M4x4.from([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
 	}
 
 	/**
-	 *
-	 * @param {number} angle
-	 * @param {number} a
-	 * @param {number} zMin
-	 * @param {number} zMax
-	 * @returns {M4x4}
+	 * Create projection matrix
+	 * @param {number} angle FOV
+	 * @param {number} a Aspect ratio
+	 * @param {number} zMin Min distance
+	 * @param {number} zMax Max distance
+	 * @returns {M4x4} Projection matrix
 	 */
 	static projection(angle, a, zMin, zMax) {
 		const ang = Math.tan((angle * 0.5 * Math.PI) / 180)
@@ -38,8 +41,8 @@ export class M4x4 extends Array {
 	}
 
 	/**
-	 *
-	 * @param {number} a
+	 * Set aspect ratio of projection matrix
+	 * @param {number} a Aspect ratio
 	 */
 	setAspectRatio(a) {
 		const oldA = this[5] / this[0]
@@ -47,8 +50,8 @@ export class M4x4 extends Array {
 	}
 
 	/**
-	 *
-	 * @param {number} angle
+	 * Rotate matrix on z-axis
+	 * @param {number} angle Rotation angle
 	 */
 	rotateZ(angle) {
 		const c = Math.cos(angle),
@@ -67,8 +70,8 @@ export class M4x4 extends Array {
 	}
 
 	/**
-	 *
-	 * @param {number} angle
+	 * Rotate matrix on x-axis
+	 * @param {number} angle Rotation angle
 	 */
 	rotateX(angle) {
 		const c = Math.cos(angle),
@@ -87,8 +90,8 @@ export class M4x4 extends Array {
 	}
 
 	/**
-	 *
-	 * @param {number} angle
+	 * Rotate matrix on y-axis
+	 * @param {number} angle Rotation angle
 	 */
 	rotateY(angle) {
 		const c = Math.cos(angle),

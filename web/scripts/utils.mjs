@@ -1,5 +1,5 @@
 /**
- *
+ * Type-safe shorthand to ensure a value isn't null
  * @template T
  * @param {T} value
  * @param {string} errorMsg
@@ -11,6 +11,8 @@ export function notNull(value, errorMsg) {
 }
 
 /**
+ * Type-safe shorthand to get document element
+ * 
  * @template {keyof HTMLElementTagNameMap} T
  * @param {T | `${T}[${string}]` | `${T}#${string}` | `${string} ${T}`} selector
  * @param {HTMLElement} parent
@@ -21,6 +23,8 @@ export function getElement(selector, parent = document) {
 }
 
 /**
+ * Type-safe shorthand to create element
+ * 
  * @template {keyof HTMLElementTagNameMap} T
  * @param {T} type
  * @param {HTMLElementTagNameMap[T]} params
@@ -35,7 +39,7 @@ export function createEl(type, params) {
 }
 
 /**
- *
+ * Shorthand to fetch text
  * @param {Parameters<typeof fetch>['0']} url
  * @returns
  */
@@ -45,6 +49,7 @@ export async function load(url) {
 }
 
 /**
+ * Wrapper to add throttling functionality to a function
  * @template {(...args) => void} T
  * @param {T} callback
  * @returns {T}
