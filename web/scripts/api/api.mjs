@@ -1,5 +1,6 @@
 export class API {
 	/**
+	 * API interface relative to a specific entrypoint.
 	 * @param {{
 	 *  name: string,
 	 *  entrypoint: URL,
@@ -19,7 +20,7 @@ export class API {
 	}
 
 	/**
-	 *
+	 * Get satellites based on a url
 	 * @param {URL} url
 	 */
 	async search(url) {
@@ -27,8 +28,8 @@ export class API {
 	}
 
 	/**
-	 *
-	 * @param {*} params
+	 * Build an url based on the api entrypoint and params
+	 * @param {*} params URL parameters
 	 */
 	buildURL(params = {}) {
 		const url = new URL(this.entrypoint)
