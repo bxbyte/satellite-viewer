@@ -5,14 +5,14 @@ import { APIs, defaultAPI, matchAPIFromUrl } from "../api/index.mjs"
 import { BookmarkHandler } from "./bookmark-handler.mjs"
 
 export class APIHandler {
-	/** 
+	/**
 	 * API handler in charge of building the API url
-	 * @param {import("./explore-handler.mjs").ExploreHandler} explore 
+	 * @param {import("./explore-handler.mjs").ExploreHandler} explore
 	 */
 	constructor(explore) {
 		/** Explore parent handler */
 		this.explore = explore
-		
+
 		/** Bookmark sub-handler */
 		this.bookmark = new BookmarkHandler(this)
 
@@ -103,7 +103,7 @@ export class APIHandler {
 	}
 
 	/**
-	 * Add a new field of current API 
+	 * Add a new field of current API
 	 * @param {string?} name Default field name
 	 * @param {string?} value Default field value
 	 */
@@ -142,9 +142,9 @@ export class APIHandler {
 	async loadSatellites() {
 		return await this.currentAPI.search(this.data.url)
 	}
-	
+
 	/**
-     * Get grouped form data
+	 * Get grouped form data
 	 * @type {{apiName: string, url: string, search: string, params: Record<string, *>}}
 	 */
 	get data() {

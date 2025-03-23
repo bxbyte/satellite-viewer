@@ -17,7 +17,7 @@ export class Scene {
 
 	/**
 	 * Satellites color buffer
-	 * @type {Float32Array} 
+	 * @type {Float32Array}
 	 */
 	#satellitesColors
 
@@ -62,7 +62,7 @@ export class Scene {
 		})
 		/** Update satellites params buffers (need to set satellites before) */
 		this.updateSatellitesParams = () => updateSatellitesParamsBuffers.forEach((b) => b())
-	
+
 		const colorLocation = this.shader.getBuffer("color", 3, this.gl.FLOAT, false, 0, 0)
 		/** Update satellites color buffer (need to set satellites before) */
 		this.updateColors = () => {
@@ -87,7 +87,7 @@ export class Scene {
 
 	/**
 	 * Set rendering function
-	 * @param {(time: number, deltaTime: number) => void} callback 
+	 * @param {(time: number, deltaTime: number) => void} callback
 	 * @param {number} maxFPS Max framerate
 	 */
 	render(callback, maxFPS = 120) {
@@ -114,10 +114,7 @@ export class Scene {
 		this.updateSatellitesParams()
 
 		// Set color buffer
-		this.#satellitesColors = Float32Array.from(
-			{ length: satellites.length * 3 },
-			() => 1
-		)
+		this.#satellitesColors = Float32Array.from({ length: satellites.length * 3 }, () => 1)
 		this.updateColors()
 	}
 

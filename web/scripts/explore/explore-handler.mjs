@@ -2,16 +2,16 @@ import { throttleFn, getElement } from "../utils.mjs"
 import { APIHandler } from "./api-handler.mjs"
 
 export class ExploreHandler {
-    /** Search handler in charge of exploring satellites */
-    constructor() {
+	/** Search handler in charge of exploring satellites */
+	constructor() {
 		this.formEl = getElement("form#explore")
 		this.satellitesEl = getElement("[name=results] ul", this.formEl)
 		/** API sub-handler */
 		this.api = new APIHandler(this)
-    }
+	}
 
 	/**
-     * "Event" triggered on search result 
+	 * "Event" triggered on search result
 	 * @param {(satellites: import("../satellite.mjs").Satellite[]) => void} callback
 	 */
 	set onresults(callback) {

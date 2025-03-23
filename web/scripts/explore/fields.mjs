@@ -11,7 +11,7 @@ import { createEl } from "../utils.mjs"
 
 /**
  * Create a select field
- * 
+ *
  * @typedef {FieldBase & { value: string }} SelectFieldValue
  * @typedef {Field<'select'> & { values: SelectFieldValue[] }} SelectField
  *
@@ -61,7 +61,7 @@ function createField(field) {
 /**
  * Create a field pair of key-value:
  * the key is defined in a select field and the value in a field depending on the key.
- * 
+ *
  * @typedef {FieldBase & { groupName: string, name: string, value: string, fieldGroup: Set<number>, fields: (FieldBase & { field: Parameters<typeof createField>[0] })[]}} NamedFields
  * @param {NamedFields} field
  */

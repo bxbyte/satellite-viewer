@@ -5,7 +5,7 @@ export class ShaderProgram {
 
 	/**
 	 * A shader program assembling fragment and vertex shaders code
-	 *  
+	 *
 	 * @param {WebGL2RenderingContext} gl WebGL2 rendering context
 	 * @param {string} fragShaderCode Fragment shader code
 	 * @param {string} vertShaderCode Vertex shader code
@@ -41,7 +41,7 @@ export class ShaderProgram {
 
 	/**
 	 * Get uniform attribute setter
-	 * 
+	 *
 	 * @typedef {Extract<keyof WebGL2RenderingContext, `uniform${string}`>} UniformKeys
 	 * @typedef {UniformKeys extends `uniform${infer U}` ? U : never} UniformTypes
 	 *

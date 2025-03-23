@@ -12,7 +12,7 @@ export function notNull(value, errorMsg) {
 
 /**
  * Type-safe shorthand to get document element
- * 
+ *
  * @template {keyof HTMLElementTagNameMap} T
  * @param {T | `${T}[${string}]` | `${T}#${string}` | `${string} ${T}`} selector
  * @param {HTMLElement} parent
@@ -24,7 +24,7 @@ export function getElement(selector, parent = document) {
 
 /**
  * Type-safe shorthand to create element
- * 
+ *
  * @template {keyof HTMLElementTagNameMap} T
  * @param {T} type
  * @param {HTMLElementTagNameMap[T]} params

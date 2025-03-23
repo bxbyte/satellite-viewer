@@ -1,16 +1,15 @@
 import { notNull } from "./utils.mjs"
 
-const 
-	DEG_TO_RAD = Math.PI / 180,
-	DAY_SECONDS = 86400,
+const DEG_TO_RAD = Math.PI / 180,
+	DAY_SECONDS = 86_400,
 	/** Earth standard gravitational parameter (https://en.wikipedia.org/wiki/Standard_gravitational_parameter) */
-	EARTH_MU = 3.986_004_418 * 1e14,
+	EARTH_MU = 398_600.4418,
 	/** Average earth radius in kilometers (https://en.wikipedia.org/wiki/Earth_radius) */
 	EARTH_RADIUS = 6_371
 
-const 
-	/** Regexp to match some second line parameters of 2LE */	
-	MATCH_2LE_L2 = /2\s+\d{5}\s+(?<inclination>.{1,8})\s+(?<raan>.{1,8})\s+(?<eccentricity>\d{1,7})\s+(?<argumentOfPerigee>.{1,8})\s+(?<meanAnomaly>.{1,8})\s+(?<meanMotion>.{1,11}).{1,5}\d{1}/gm,
+const /** Regexp to match some second line parameters of 2LE */
+	MATCH_2LE_L2 =
+		/2\s+\d{5}\s+(?<inclination>.{1,8})\s+(?<raan>.{1,8})\s+(?<eccentricity>\d{1,7})\s+(?<argumentOfPerigee>.{1,8})\s+(?<meanAnomaly>.{1,8})\s+(?<meanMotion>.{1,11}).{1,5}\d{1}/gm,
 	/** Regexp to match name and 2nd line of 3LE */
 	MATCH_3LE = new RegExp(String.raw`(?<name>^.*$)(?:\s+1.*\s+${MATCH_2LE_L2.source})`, "gm")
 
@@ -37,7 +36,7 @@ export class Satellite {
 
 	/**
 	 * Create satellite from 2LE matched params
-	 * @param {Record<typeof SATELLITES_PARAMS, string>} params 
+	 * @param {Record<typeof SATELLITES_PARAMS, string>} params
 	 */
 	static #from2LEStringObject(params) {
 		const satellite = new Satellite()
@@ -45,7 +44,7 @@ export class Satellite {
 		SATELLITES_PARAMS.forEach((k) => (satellite[k] = parseFloat(params[k])))
 
 		// Normalize
-		const n = satellite.meanMotion / DAY_SECONDS
+		const n = (satellite.meanMotion * 2 * Math.PI) / DAY_SECONDS
 		satellite.eccentricity = satellite.eccentricity
 		satellite.semiMajorAxis = Math.cbrt(EARTH_MU / (n * n)) / EARTH_RADIUS
 		satellite.inclination = satellite.inclination * DEG_TO_RAD

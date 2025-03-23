@@ -3,7 +3,7 @@ import { createEl } from "../utils.mjs"
 import { bookmarks } from "../bookmark.mjs"
 
 export class BookmarkHandler {
-	/** 
+	/**
 	 * Bookmark handler in charge of handling bookmarks
 	 * @param {import("./api-handler.mjs").APIHandler} api Parent handler
 	 */
@@ -72,7 +72,7 @@ export class BookmarkHandler {
 
 	/**
 	 * Fill toggle button if bookmarked, outline otherwise
-	 * @param {boolean} isBookmarked 
+	 * @param {boolean} isBookmarked
 	 */
 	set isBookmarked(isBookmarked) {
 		this.toggleBtn.classList.toggle("bookmarked", isBookmarked)
