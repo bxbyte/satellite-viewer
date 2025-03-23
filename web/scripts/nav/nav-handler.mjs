@@ -15,8 +15,8 @@ export class NavigationHandler {
 		this.formEl.addEventListener("input", this.updateURL.bind(this))
 
 		this.fieldsEl = getElement("[name=options] ul", this.formEl)
-		this.searchResultsEl = getElement("[name=results] ul", this.formEl)
-		this.urlInputEl = getElement("input[name=url]")
+		this.satellitesEl = getElement("[name=results] ul", this.formEl)
+		this.urlEl = getElement("input[name=url]")
 
 		this.apiNameEl = getElement("select[name=apiName]", this.formEl)
 		this.apiNameEl.append(
@@ -32,10 +32,10 @@ export class NavigationHandler {
 
 		this.bookmark = new BookmarkHandler(this) // Bookmark sub handler
 
-		this.setDefaultField()
+		this.initDefaults()
 	}
 
-	setDefaultField() {
+	initDefaults() {
 		this.addField(this.api.defaultField)
 		this.updateURL()
 	}
@@ -48,8 +48,8 @@ export class NavigationHandler {
 		this.bookmark.updateURLToggle(url)
 
 		// Update URL field
-		this.urlInputEl.value = url
-		this.urlInputEl.scrollTo({ left: this.urlInputEl.scrollWidth })
+		this.urlEl.value = url
+		this.urlEl.scrollTo({ left: this.urlEl.scrollWidth })
 	}
 
 	/**
@@ -71,7 +71,7 @@ export class NavigationHandler {
 		if (this.api.name == apiName) return
 		this.api = APIs[apiName]
 		this.resetFields()
-		this.setDefaultField()
+		this.initDefaults()
 	}
 
 	/**
@@ -191,12 +191,12 @@ export class NavigationHandler {
 	 * @param {import("../satellite.mjs").Satellite[]} satellites
 	 */
 	set satellites(satellites) {
-		this.searchResultsEl.parentElement.dataset.totalItems = satellites.length
+		this.satellitesEl.parentElement.dataset.totalItems = satellites.length
 		const rows = satellites.map(({ name }) => {
 			const row = document.createElement("li")
 			row.innerText = name
 			return row
 		})
-		this.searchResultsEl.replaceChildren(...rows)
+		this.satellitesEl.replaceChildren(...rows)
 	}
 }

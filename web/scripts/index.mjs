@@ -1,9 +1,9 @@
-import { SatellitesCanvas } from "./canvas/index.mjs"
+import { Scene } from "./canvas/index.mjs"
 import { NavigationHandler } from "./nav/index.mjs"
 import { defaultSatellites } from "./satellite.mjs"
 
 function main() {
-	const satelliteCanvas = new SatellitesCanvas()
+	const satelliteCanvas = new Scene()
 	satelliteCanvas.satellites = defaultSatellites
 
 	const nav = new NavigationHandler()
