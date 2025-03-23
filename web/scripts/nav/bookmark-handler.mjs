@@ -20,7 +20,7 @@ export class BookmarkHandler {
 	#openDialog() {
 		const rows = [...bookmarks.bookmarks].map((url) => {
 			const row = createEl("li", {
-				textContent: this.nav.data.url,
+				textContent: url,
 				// Set clicked url
 				onclick: () => {
 					this.nav.updateFromURL(url)
