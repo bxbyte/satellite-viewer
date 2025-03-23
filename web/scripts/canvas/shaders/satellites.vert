@@ -70,7 +70,7 @@ vec3 computeECI() {
 }
 
 void main() {
-  gl_PointSize = 5.;
+  gl_PointSize = 3.;
   gl_Position = ctrl.projection * ctrl.view * ctrl.motion * vec4(computeECI(), 1.);
   ptColor = vec4(color, 1);
   ptPosition = ctrl.resolution * ((gl_Position.xy / gl_Position.w) * .5 + .5);

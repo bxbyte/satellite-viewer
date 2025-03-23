@@ -24,12 +24,10 @@ export class APIHandler {
 
 		/** API selection input */
 		this.apiNameEl = getElement("select[name=apiName]", explore.formEl)
-		this.apiNameEl.append(
-			...Object.keys(APIs).map(
-				// Set all APIs option
-				(apiName) => new Option(apiName, apiName, null, apiName == this.currentAPI.name)
-			)
-		)
+		// Set all APIs option
+		this.apiNameEl.append(...Object.keys(APIs).map(
+			(apiName) => new Option(apiName, apiName, null, apiName == this.currentAPI.name)
+		))
 		this.apiNameEl.addEventListener("input", this.updateAPI.bind(this))
 
 		/** API fields list */
