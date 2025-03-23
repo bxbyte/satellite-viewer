@@ -32,7 +32,6 @@ export class Scene {
 			this.cvs.getContext("webgl2", {
 				premultipliedAlpha: false, // Use alpha
 				powerPreference: "high-performance",
-				preserveDrawingBuffer: true,
 			}),
 			"Your browser doesn't support the Webgl2 API"
 		)
