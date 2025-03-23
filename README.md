@@ -1,5 +1,7 @@
 # Satellite Viewer
 
+![](./docs/showcase.gif)
+
 Little project that display ECI coordinates based on 2LE data from both the [Celestrak](https://celestrak.org) and [TLE-API](https://tle.ivanstanojevic.me) APIs.
 
 This is a little project made for a class at the [IUT2](https://iut2.univ-grenoble-alpes.fr) of the [University of Grenoble Alpes](https://www.univ-grenoble-alpes.fr/).
@@ -46,3 +48,7 @@ This project was made in full vanilla JS and should be compatible with most mode
 ### Note on `celestrak-pipe.mjs` & `web/data/satellites.bin`
 
 The script `celestrak-pipe.mjs` is run on each deploy with Github Page to get and transform TLEs into binary in `data/satellites.bin`, that file being used to load and display default satellites.
+
+# TLE Data to ECI
+
+Cause I ain't a math genius, I implemented [this solution](./docs/Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf) I found on the internet to convert TLE data to ECI.
