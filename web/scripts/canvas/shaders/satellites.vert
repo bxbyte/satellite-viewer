@@ -27,41 +27,51 @@ in vec3 color;
 out vec4 ptColor;
 out vec2 ptPosition;
 
+/** Implementation of the TLE to ECI conversion */
 vec3 computeECI() {
-
-  // Solve kepler
+  // Step 1 is skipped as it's prepare before
   float M = meanAnomaly + meanMotion * ctrl.time;
+
+  // Step 2: Solve Kepler's equation M = E - eccentricity * sin(E)
+  // with the Newton-Raphson method
   float E = M;
   for (int i = 0; i < 10; i++) {
-    E = E - (E - eccentricity * sin(E) - M) / (1.0 - eccentricity * cos(E));
+    E = E - (E - eccentricity * sin(E) - M) / (1. - eccentricity * cos(E));
   }
 
-  float v = 2.0 * atan(sqrt((1.0 + eccentricity) / (1.0 - eccentricity)) *
-                       tan(E / 2.0));
+  // Step 3: Get true anomaly with an equivalent formula
+  float v = 2. * atan(
+    sqrt((1. + eccentricity) / (1. - eccentricity)) 
+    * tan(E / 2.)
+  );
 
-  float r = semiMajorAxis * (1.0 - eccentricity * cos(E));
-  float xSatelliteal = r * cos(v);
-  float ySatelliteal = r * sin(v);
+  // Step 4: Get distance relative to earth
+  float r = semiMajorAxis * (1. - eccentricity * cos(E));
 
-  // Rotation matrices
+  // Step 5:
+  vec2 o = vec2(r * cos(v), r * sin(v));
+
+  // Step 6. Optimized version of the final transformation
   float cosArgPerigee = cos(argumentOfPerigee);
   float sinArgPerigee = sin(argumentOfPerigee);
 
-  // Apply rotations in the correct order
-  float xTemp = xSatelliteal * cosArgPerigee - ySatelliteal * sinArgPerigee;
-  float yTemp = xSatelliteal * sinArgPerigee + ySatelliteal * cosArgPerigee;
+  float tempX = o.x * cosArgPerigee - o.y * sinArgPerigee;
+  float tempY = o.x * sinArgPerigee + o.y * cosArgPerigee;
 
-  float yIncl = yTemp * cos(inclination);
+  float yIncl = tempY * cos(inclination);
   float cosRAAN = cos(raan);
   float sinRAAN = sin(raan);
 
-  return vec3(xTemp * cosRAAN - yIncl * sinRAAN,
-              xTemp * sinRAAN + yIncl * cosRAAN, yTemp * sin(inclination));
+  return vec3(
+    tempX * cosRAAN - yIncl * sinRAAN,
+    tempX * sinRAAN + yIncl * cosRAAN,
+    tempY * sin(inclination)
+  );
 }
 
 void main() {
   gl_PointSize = 5.;
-  gl_Position = ctrl.projection * ctrl.view * ctrl.motion * vec4(computeECI(), 1.0);
+  gl_Position = ctrl.projection * ctrl.view * ctrl.motion * vec4(computeECI(), 1.);
   ptColor = vec4(color, 1);
   ptPosition = ctrl.resolution * ((gl_Position.xy / gl_Position.w) * .5 + .5);
 }

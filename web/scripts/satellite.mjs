@@ -1,8 +1,12 @@
 import { notNull } from "./utils.mjs"
 
-const MU = 398600.4418,
-	EARTH_RADIUS = 6371,
-	DEG_TO_RAD = Math.PI / 180
+const 
+	DEG_TO_RAD = Math.PI / 180,
+	DAY_SECONDS = 86400,
+	/** Earth standard gravitational parameter (https://en.wikipedia.org/wiki/Standard_gravitational_parameter) */
+	EARTH_MU = 3.986_004_418 * 1e14,
+	/** Average earth radius in kilometers (https://en.wikipedia.org/wiki/Earth_radius) */
+	EARTH_RADIUS = 6_371
 
 const 
 	/** Regexp to match some second line parameters of 2LE */	
@@ -41,9 +45,9 @@ export class Satellite {
 		SATELLITES_PARAMS.forEach((k) => (satellite[k] = parseFloat(params[k])))
 
 		// Normalize
-		const n = (satellite.meanMotion * 2 * Math.PI) / 86400
+		const n = satellite.meanMotion / DAY_SECONDS
 		satellite.eccentricity = satellite.eccentricity
-		satellite.semiMajorAxis = Math.cbrt(MU / (n * n)) / EARTH_RADIUS
+		satellite.semiMajorAxis = Math.cbrt(EARTH_MU / (n * n)) / EARTH_RADIUS
 		satellite.inclination = satellite.inclination * DEG_TO_RAD
 		satellite.raan = satellite.raan * DEG_TO_RAD
 		satellite.argumentOfPerigee = satellite.argumentOfPerigee * DEG_TO_RAD
