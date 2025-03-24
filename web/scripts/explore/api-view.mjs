@@ -61,6 +61,10 @@ export class ApiView {
 		})
 	}
 
+	get hasValidURL() {
+		return this.#formEl.checkValidity()
+	}
+
 	/** @param {URL} url */
 	set url(url) {
 		this.#urlEl.value = url

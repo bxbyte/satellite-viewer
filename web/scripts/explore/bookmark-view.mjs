@@ -72,4 +72,9 @@ export class BookmarkView {
 	set isBookmarked(isBookmarked) {
 		this.#toggleEl.classList.toggle("bookmarked", isBookmarked)
 	}
+
+	/** @param {boolean} isBookmarkable */
+	set isBookmarkable(isBookmarkable) {
+		this.#toggleEl.disabled = !isBookmarkable
+	}
 }

@@ -65,6 +65,7 @@ export class ExploreController {
         this.#apiView.apiName = api.name
         this.#apiView.url = api.entrypoint
         this.#apiView.params = api.params
+        this.#bookmarkView.isBookmarkable = false;
     }
 
     /**
@@ -76,6 +77,7 @@ export class ExploreController {
         const url = this.#api.buildURL(params)
         this.#apiView.url = url
         this.#bookmarkView.isBookmarked = bookmarks.has(url)
+        this.#bookmarkView.isBookmarkable = this.#apiView.hasValidURL;
     }
 
     /**
