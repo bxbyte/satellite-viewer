@@ -52,9 +52,10 @@ export async function load(url) {
  * Wrapper to add throttling functionality to a function
  * @template {(...args) => void} T
  * @param {T} callback
+ * @param {number} minDeltaTime
  * @returns {T}
  */
-export function throttleFn(callback, minDeltaTime = 300) {
+export function throttleFn(callback, minDeltaTime) {
 	let lastCallTime = 0
 	return (...args) => {
 		const now = Date.now()

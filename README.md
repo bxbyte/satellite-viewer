@@ -18,32 +18,59 @@ This project was made in full vanilla JS and should be compatible with most mode
     ├── ...
     ├── cache-sw.mjs                        # Cache service worker
     ├── data
-    │   └── satellites.bin                  # Default satellites params
+    │   └── satellites.bin                  # Default satellites orbitals elements
     └── scripts
+        ├── index.mjs                       # Application entrypoint
+        ├── cache.mjs                       # Cache worker entrypoint
+        ├── bookmark.mjs                    # Bookmark modal
+        ├── satellite.mjs                   # Satellite modal
         ├── api
         │   ├── ...
-        │   ├── api.mjs                     # API common "interface"
+        │   ├── api.mjs                     # API Modal
         │   └── sources
         │       ├── celestrak.mjs           # Celestrak API implementations
         │       └── tle-api.mjs             # TLE-API API implementation
-        ├── bookmark.mjs                    # Bookmark implementation
-        ├── satellite.mjs                   # Satellite implementation
-        ├── cache.mjs                       # Cache worker entrypoint
         ├── canvas
         │   ├── ...
-        │   ├── scene-controls.mjs          # Scene controllers
-        │   ├── scene.mjs                   # Scene renderer
-        │   ├── matrix.mjs                  # Matrix model implementations
-        │   ├── shader-program.mjs          # Shader model implementations
-        │   └── shaders                     # Shader programs' codes
+        │   ├── scene-view.mjs              # View for scene renderer
+        │   ├── scene-gestures.mjs          # Scene gestures (zoom, rotate, ...)
+        │   ├── matrix.mjs                  # Matrix implementations (for projection & stuff)
+        │   ├── shader-program.mjs          # Shader assembler (compile, uniforms access, ...)
+        │   └── shaders                     # Shader programs' code
         │       └── ...
         └── explore
             ├── ...
-            ├── api-handler.mjs             # API form handler
-            ├── bookmark-handler.mjs        # Bookmark form handler
-            ├── explore-handler.mjs         # Explore form handler
-            └── fields.mjs                  # Generated fields implementation
+            ├── explore-controller.mjs      # Controller handling the user exploration
+            ├── api-view.mjs                # View handling api interaction
+            ├── bookmark-view.mjs           # View handling bookmarks
+            └── fields.mjs                  # Dynamic input fields implementation
 ```
+
+### The MVC model
+
+Here's a global representation of the implemented MVC model:
+
+```mermaid
+graph TD;
+    classDef controller stroke:#9b6d5a,stroke-width:2px;
+    classDef view stroke:#cdeb8b,stroke-width:2px;
+    classDef modal stroke:#428ac9,stroke-width:2px;
+
+    NC("ExploreController"):::controller
+    NC <-- set / update --> AV("ApiView"):::view
+    NC <-- set / update --> BV("BookmarkView"):::view
+    NC -- set --> SV("SceneView"):::view
+
+    AM("API"):::modal
+    AM -- create --> SM("Satellite"):::modal
+    NC -- fetch --> AM
+    NC <-- read/write --> BM("Bookmarks"):::modal    
+```
+**Legend**
+- Model in blue
+- View in yellowgreen
+- Controller in brow
+
 
 ### Note on `celestrak-pipe.mjs` & `web/data/satellites.bin`
 
@@ -51,4 +78,4 @@ The script `celestrak-pipe.mjs` is run on each deploy with Github Page to get an
 
 # TLE Data to ECI
 
-Cause I ain't a math genius, I implemented [this solution](./docs/Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf) I found on the internet to convert TLE data to ECI.
+The orbital elements (from TLE data) to Earth Centered Inertial (ECI) coordinates conversion done here is an implementation with some tweaks of [the method described in this paper from M. René Schwarz](./docs/Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf), found on the internet.

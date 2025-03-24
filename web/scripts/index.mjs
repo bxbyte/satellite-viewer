@@ -1,15 +1,13 @@
-import { Scene } from "./canvas/index.mjs"
-import { ExploreHandler } from "./explore/index.mjs"
+import { SceneView } from "./canvas/index.mjs"
+import { ExploreController } from "./explore/index.mjs"
 import { defaultSatellites } from "./satellite.mjs"
 
 function main() {
-	const scene = new Scene()
+	const scene = new SceneView()
 	scene.satellites = defaultSatellites
 
-	const nav = new ExploreHandler()
-	nav.onresults = async (satellites) => (scene.satellites = satellites)
-
-	scene.setSatelliteColor(0, [1, 0, 0])
+	const nav = new ExploreController()
+	nav.onResults = (satellites) => scene.satellites = satellites
 }
 
 // Run main

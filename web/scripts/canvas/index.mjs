@@ -1,1 +1,1 @@
-export { Scene } from "./scene.mjs"
+export { SceneView } from "./scene-view.mjs"

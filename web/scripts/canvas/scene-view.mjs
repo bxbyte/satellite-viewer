@@ -1,6 +1,6 @@
 import { getElement, notNull, load } from "../utils.mjs"
 import { SATELLITES_PARAMS } from "../satellite.mjs"
-import { SceneControls } from "./scene-controls.mjs"
+import { SceneControls } from "./scene-gestures.mjs"
 import { ShaderProgram } from "./shader-program.mjs"
 
 /** WebGL fragment and vertex shaders code */
@@ -8,7 +8,7 @@ const shadersCode = await Promise.all(
 	["./shaders/satellites.frag", "./shaders/satellites.vert"].map(async (f) => load(new URL(f, import.meta.url)))
 )
 
-export class Scene {
+export class SceneView {
 	/**
 	 * Current satellites
 	 * @type {import("../satellite.mjs").Satellite[]}
@@ -24,7 +24,7 @@ export class Scene {
 	constructor() {
 		this.#satellites = []
 
-		/** Scene canvas */
+		/** scene canvas */
 		this.cvs = getElement("canvas")
 
 		/** Rendering context */
@@ -40,7 +40,7 @@ export class Scene {
 		this.shader = new ShaderProgram(this.gl, ...shadersCode)
 		this.shader.use()
 
-		/** Scene controls */
+		/** scene controls */
 		this.controls = new SceneControls(this)
 		this.controls.view[14] = this.controls.view[14] - 15 // zoom
 		this.controls.updateView()

@@ -4,8 +4,8 @@ import { API } from "../api.mjs"
 export const TleApi = new API({
 	name: "TLE API",
 	entrypoint: new URL("https://tle.ivanstanojevic.me/api/tle"),
-	defaultField: "search",
-	fields: [
+	requiredParam: "search",
+	params: [
 		{
 			label: "Search by name",
 			field: {

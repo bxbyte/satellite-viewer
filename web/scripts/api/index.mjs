@@ -9,7 +9,7 @@ export const APIs = Object.fromEntries([CelestrakGPApi, CelestrakSubGPApi, TleAp
  * Get a known API based on a url entrypoint
  * @param {URL} url
  */
-export function matchAPIFromUrl(url) {
+export function matchApiFromUrl(url) {
 	return Object.values(APIs).find(
 		(api) => api.entrypoint.origin == url.origin && api.entrypoint.pathname == url.pathname
 	)

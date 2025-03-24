@@ -25,7 +25,7 @@ export function createSelectField({ label, value: defaultValue, values, ...field
 	valuePlaceholder.hidden = true
 
 	/**
-	 *
+	 * Yeah not the greatest way to do this but it just work
 	 * @param {SelectFieldValue[]} values
 	 */
 	el.setValues = (values) => {

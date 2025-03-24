@@ -1,1 +1,1 @@
-export { ExploreHandler } from "./explore-handler.mjs"
+export { ExploreController } from "./explore-controller.mjs"

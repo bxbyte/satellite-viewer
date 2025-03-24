@@ -1,7 +1,7 @@
 import { Satellite } from "../../satellite.mjs"
 import { API } from "../api.mjs"
 
-const fields = [
+const params = [
 	{
 		label: "Search by name",
 		field: {
@@ -24,7 +24,7 @@ const fields = [
 		field: {
 			name: "INTDES",
 			type: "text",
-			pattern: "\\d{4}-\\w{3}",
+			pattern: "\\d{4}-\\w{3,}",
 			placeholder: "yyyy-nnn",
 		},
 	},
@@ -50,12 +50,12 @@ const load = async (res) => Satellite.collectionFrom3LEs(await res.text())
 
 export const CelestrakGPApi = new API({
 	name: "Celestral GP",
+	load,
 	entrypoint: new URL("https://celestrak.org/NORAD/elements/gp.php"),
 	defaultParams,
-	load,
-	defaultField: "NAME",
-	fields: [
-		...fields,
+	requiredParam: "NAME",
+	params: [
+		...params,
 		{
 			label: "Group",
 			field: {
@@ -124,12 +124,12 @@ export const CelestrakGPApi = new API({
 
 export const CelestrakSubGPApi = new API({
 	name: "Celestral SubGP",
+	load,
 	entrypoint: new URL("https://celestrak.org/NORAD/elements/supplemental/sup-gp.php"),
 	defaultParams,
-	load,
-	defaultField: "NAME",
-	fields: [
-		...fields,
+	requiredParam: "NAME",
+	params: [
+		...params,
 		{
 			label: "Source",
 			field: {
