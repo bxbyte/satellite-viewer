@@ -83,10 +83,12 @@ export class SceneControls {
 			this.cursor = "grabbing"
 		})
 		// Reset pointer when user stop clicking
-		this.scene.cvs.addEventListener("pointerup", () => {
+		const resetPointer = () => {
 			this.prevPointer = null
 			this.resetCursor()
-		})
+		}
+		this.scene.cvs.addEventListener("pointerup", resetPointer)
+		this.scene.cvs.addEventListener("pointerleave", resetPointer)
 		// Rotate on user move with pointer down
 		this.scene.cvs.addEventListener("pointermove", (ev) => {
 			if (!this.prevPointer) return
