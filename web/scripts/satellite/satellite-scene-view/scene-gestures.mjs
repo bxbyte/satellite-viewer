@@ -14,7 +14,12 @@ export class SceneControls {
 		this.setTime = this.SatelliteSceneView.shader.getUniformSetter("ctrl.time", "1f")
 		this.setResolution = this.SatelliteSceneView.shader.getUniformSetter("ctrl.resolution", "2f")
 
-		this.projection = M4x4.projection(40, this.SatelliteSceneView.cvs.width / this.SatelliteSceneView.cvs.height, 0, 100)
+		this.projection = M4x4.projection(
+			40,
+			this.SatelliteSceneView.cvs.width / this.SatelliteSceneView.cvs.height,
+			0,
+			100
+		)
 		const setProjection = this.SatelliteSceneView.shader.getUniformSetter("ctrl.projection", "Matrix4fv")
 		this.updateProjection = () => setProjection(false, this.projection)
 

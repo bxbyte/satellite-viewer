@@ -70,8 +70,8 @@ export class ApiView {
 
 	/**
 	 * Add a new parameter field
-	 * 
-	 * @param {Parameters<typeof createNamedFields>['0']['fields']} params Parameters' field definition 
+	 *
+	 * @param {Parameters<typeof createNamedFields>['0']['fields']} params Parameters' field definition
 	 * @param {string?} name Default param name
 	 * @param {string?} value Default param value
 	 */
@@ -105,7 +105,7 @@ export class ApiView {
 
 	/**
 	 * Get aggregated form data
-	 * 
+	 *
 	 * @type {{apiName: string, url: string, params: Record<string, *>}}
 	 */
 	get data() {

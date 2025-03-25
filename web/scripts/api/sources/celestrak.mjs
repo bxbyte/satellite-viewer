@@ -63,8 +63,8 @@ export const CelestrakGPApi = new API({
 				label: "Select a group",
 				values: [
 					{ value: "last-30-days", label: "Last 30 Days' Launches" },
-					{ value: "stations", label: "Space Stations", },
-					{ value: "visual", label: "100 (or so) Brightest", },
+					{ value: "stations", label: "Space Stations" },
+					{ value: "visual", label: "100 (or so) Brightest" },
 					{ value: "active", label: "Active Satellites" },
 					{ value: "analyst", label: "Analyst Satellites" },
 					{ value: "cosmos-1408-debris", label: "Russian ASAT Test Debris (COSMOS 1408)" },
@@ -181,8 +181,8 @@ export const CelestrakSubGPApi = new API({
 					{ value: "css", label: "CSS" },
 					{ value: "cpf", label: "CPF" },
 					{ value: "kuiper", label: "Kuiper" },
-					{ value: "ast", label: "AST Space Mobile" }
-				]
+					{ value: "ast", label: "AST Space Mobile" },
+				],
 			},
 		},
 	],

@@ -64,7 +64,7 @@ graph TD;
     SeC -- set --> SaC
 
     SaC("SatelliteController"):::controller
-    
+
     SaC -- set --> SLV("SatelliteListView"):::view
     SaC -- set --> SSV("SatelliteSceneView"):::view
 
@@ -81,13 +81,14 @@ graph TD;
     AM("API"):::modal
     AM -- create --> SM("Satellite"):::modal
     SeC -- fetch --> AM
-    SeC <-- get / set --> BM("Bookmarks"):::modal    
+    SeC <-- get / set --> BM("Bookmarks"):::modal
 ```
+
 **Legend**
+
 - Model in blue
 - View in yellowgreen
 - Controller in brow
-
 
 ### Note on `celestrak-pipe.mjs` & `web/data/satellites.bin`
 

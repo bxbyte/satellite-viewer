@@ -1,10 +1,9 @@
 import { getElement } from "../utils.mjs"
 
 export class SatelliteListView {
-
-    /** API results list */
+	/** API results list */
 	#satellitesEl = getElement("[name=satellites] ul")
-    
+
 	/** @param {import("../satellite.mjs").Satellite[]} satellites */
 	set satellites(satellites) {
 		this.#satellitesEl.parentElement.dataset.totalItems = satellites.length

@@ -5,7 +5,6 @@ import { createEl } from "../utils.mjs"
  * Form view handling bookmark related manipulation
  */
 export class BookmarkView {
-
 	/** Bookmarks dialog */
 	#dialogEl = getElement("dialog")
 
@@ -34,9 +33,9 @@ export class BookmarkView {
 		this.#toggleEl.addEventListener("click", onToggleBookmark)
 	}
 
-	/** 
+	/**
 	 * Open bookmarks dialog
-	 * 
+	 *
 	 * @param {URL[]} bookmarkedURLs
 	 */
 	showDialog(bookmarkedURLs) {
