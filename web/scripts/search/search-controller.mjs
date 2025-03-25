@@ -35,6 +35,8 @@ export class SearchController {
 			this.#apiView.addParamField(this.#api.params, this.#api.requiredParam)
 		}
 
+		this.#apiView.onAddParam = () => this.#apiView.addParamField(this.#api.params)
+
 		this.#apiView.onSearch = throttleFn(async (url) => {
 			this.#apiView.isLoading = true
 			const results = await this.#api.search(url)

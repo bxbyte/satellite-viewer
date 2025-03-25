@@ -24,9 +24,6 @@ export class ApiView {
 	constructor(apiNames) {
 		// Set all APIs option
 		this.#apiNameEl.append(...apiNames.map((v) => new Option(v, v)))
-
-		// Add param on user demand
-		this.#addFieldEl.addEventListener("click", this.addParamField.bind(this))
 	}
 
 	/** @param {boolean} isLoading */
@@ -40,9 +37,14 @@ export class ApiView {
 		this.#paramsEl.innerHTML = ""
 	}
 
-	/** @param {(apiName: string) => void} onParamsChange */
+	/** @param {(params: ApiView['data']['params']) => void} onParamsChange */
 	set onParamsChange(onParamsChange) {
 		this.#formEl.addEventListener("input", () => onParamsChange(this.data.params))
+	}
+
+	/** @param {() => void} onAddParam */
+	set onAddParam(onAddParam) {
+		this.#addFieldEl.addEventListener("click", onAddParam)
 	}
 
 	/** @param {(apiName: string) => void} onApiChange */
