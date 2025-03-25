@@ -1,6 +1,5 @@
 /**
- * This scripts is run at every deploy (every 3h on the github runner)
- * to update the default satellites displayed based on data from celestrak.org
+ * This scripts is run at every deploy to update the default satellites displayed based on data from celestrak.org
  * in order to respect their rate limit and improve load time.
  *
  * @see /.github/workflows/deploy.yml
