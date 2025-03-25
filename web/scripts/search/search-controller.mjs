@@ -5,7 +5,7 @@ import { throttleFn } from "../utils.mjs";
 import { ApiView } from "./api-view.mjs";
 import { BookmarkView } from "./bookmark-view.mjs";
 
-export class ExploreController {
+export class SearchController {
     /** 
      * Current API used
      * @type {typeof defaultAPI}
@@ -39,7 +39,6 @@ export class ExploreController {
             this.#apiView.isLoading = true
             const results = await this.#api.search(url)
             this.#apiView.isLoading = false
-            this.#apiView.results = results
             this.onResults(results)
         }, 300)
 

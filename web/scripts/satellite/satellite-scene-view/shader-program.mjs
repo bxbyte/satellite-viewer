@@ -1,4 +1,4 @@
-import { notNull } from "../utils.mjs"
+import { notNull } from "../../utils.mjs"
 
 export class ShaderProgram {
 	#shaderProgram

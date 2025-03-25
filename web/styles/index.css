@@ -306,7 +306,7 @@ form {
 		}
 	}
 
-	[name="results"] {
+	[name="satellites"] {
 		&,
 		& > ul {
 			display: flex;

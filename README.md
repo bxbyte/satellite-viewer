@@ -22,28 +22,33 @@ This project was made in full vanilla JS and should be compatible with most mode
     └── scripts
         ├── index.mjs                       # Application entrypoint
         ├── cache.mjs                       # Cache worker entrypoint
-        ├── bookmark.mjs                    # Bookmark modal
-        ├── satellite.mjs                   # Satellite modal
+        ├── utils.mjs                       # Utils used globally
+        ├── bookmark.mjs                    # Modal for bookmarks
+        ├── satellite.mjs                   # Modal for satellite
         ├── api
         │   ├── ...
-        │   ├── api.mjs                     # API Modal
+        │   ├── api.mjs                     # Modal for API
         │   └── sources
-        │       ├── celestrak.mjs           # Celestrak API implementations
-        │       └── tle-api.mjs             # TLE-API API implementation
-        ├── canvas
+        │       ├── celestrak.mjs           # API implementations for Celestrak
+        │       └── tle-api.mjs             # API implementation for TLE-API
+        ├── satellite
         │   ├── ...
-        │   ├── scene-view.mjs              # View for scene renderer
-        │   ├── scene-gestures.mjs          # Scene gestures (zoom, rotate, ...)
-        │   ├── matrix.mjs                  # Matrix implementations (for projection & stuff)
-        │   ├── shader-program.mjs          # Shader assembler (compile, uniforms access, ...)
-        │   └── shaders                     # Shader programs' code
-        │       └── ...
-        └── explore
+        │   ├── satellite-controller.mjs    # Controller handling satellite interaction
+        │   ├── satellite-list-view.mjs     # View listing satellite (for results)
+        │   └── satellite-scene-view        # View displaying satellites in 3d
+        │       ├── ...
+        │       ├── scene-view.mjs          # View scene renderer
+        │       ├── scene-gestures.mjs      # Handler for view gestures (zoom, rotate, ...)
+        │       ├── matrix.mjs              # Matrix implementations (for 3d, ...)
+        │       ├── shader-program.mjs      # Shader assembler (compilation, ...)
+        │       └── shaders                 # Shader programs' code
+        │           └── ...
+        └── search
             ├── ...
-            ├── explore-controller.mjs      # Controller handling the user exploration
+            ├── search-controller.mjs       # Controller handling search
             ├── api-view.mjs                # View handling api interaction
-            ├── bookmark-view.mjs           # View handling bookmarks
-            └── fields.mjs                  # Dynamic input fields implementation
+            ├── bookmark-view.mjs           # View handling bookmarks interaction
+            └── fields.mjs                  # Utils to create custom input fields
 ```
 
 ### The MVC model
@@ -56,15 +61,27 @@ graph TD;
     classDef view stroke:#cdeb8b,stroke-width:2px;
     classDef modal stroke:#428ac9,stroke-width:2px;
 
-    NC("ExploreController"):::controller
-    NC <-- set / update --> AV("ApiView"):::view
-    NC <-- set / update --> BV("BookmarkView"):::view
-    NC -- set --> SV("SceneView"):::view
+    SeC -- set --> SaC
+
+    SaC("SatelliteController"):::controller
+    
+    SaC -- set --> SLV("SatelliteListView"):::view
+    SaC -- set --> SSV("SatelliteSceneView"):::view
+
+    SeC("SearchController"):::controller
+
+    AV("ApiView")
+    SeC -- set --> AV:::view
+    AV:::view -- update --> SeC
+
+    BV("BookmarkView")
+    SeC -- set --> BV:::view
+    BV:::view -- update --> SeC
 
     AM("API"):::modal
     AM -- create --> SM("Satellite"):::modal
-    NC -- fetch --> AM
-    NC <-- read/write --> BM("Bookmarks"):::modal    
+    SeC -- fetch --> AM
+    SeC <-- get / set --> BM("Bookmarks"):::modal    
 ```
 **Legend**
 - Model in blue

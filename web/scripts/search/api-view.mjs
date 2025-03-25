@@ -3,7 +3,7 @@ import { createEl, getElement } from "../utils.mjs"
 
 export class ApiView {
 	/** Form with API entry */
-	#formEl = getElement("form#explore")
+	#formEl = getElement("form#search")
 
 	/** API url "input" */
 	#urlEl = getElement("input[name=url]", this.#formEl)
@@ -16,9 +16,6 @@ export class ApiView {
 
 	/** API add field button  */
 	#addFieldEl = getElement("button[name=add-option]", this.#formEl)
-
-	/** API results list */
-	#resultsEl = getElement("[name=results] ul", this.#formEl)
 
 	/**
 	 * Form view handling the API
@@ -69,17 +66,6 @@ export class ApiView {
 	set url(url) {
 		this.#urlEl.value = url
 		this.#urlEl.scrollTo({ left: this.#urlEl.scrollWidth })
-	}
-
-	/** @param {string[]} results */
-	set results(results) {
-		this.#resultsEl.parentElement.dataset.totalItems = results.length
-		const rows = results.map(({ name }) => {
-			const row = document.createElement("li")
-			row.innerText = name
-			return row
-		})
-		this.#resultsEl.replaceChildren(...rows)
 	}
 
 	/**

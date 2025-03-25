@@ -1,13 +1,10 @@
-import { SceneView } from "./canvas/index.mjs"
-import { ExploreController } from "./explore/index.mjs"
-import { defaultSatellites } from "./satellite.mjs"
+import { SatelliteController } from "./satellite/index.mjs"
+import { SearchController } from "./search/index.mjs"
 
 function main() {
-	const scene = new SceneView()
-	scene.satellites = defaultSatellites
-
-	const nav = new ExploreController()
-	nav.onResults = (satellites) => scene.satellites = satellites
+	const searchController = new SearchController()
+	const satelliteController = new SatelliteController()
+	searchController.onResults = (satellites) => satelliteController.satellites = satellites
 }
 
 // Run main
