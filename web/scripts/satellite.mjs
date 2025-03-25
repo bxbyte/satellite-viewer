@@ -40,18 +40,25 @@ export class Satellite {
 	 */
 	static #from2LEStringObject(params) {
 		const satellite = new Satellite()
-		params.eccentricity = "0." + params.eccentricity
+		// Reformat eccentricity to float string as it's only the decimal part
+		params.eccentricity = "." + params.eccentricity
+
+		// Convert orbitals elements from string to float
 		SATELLITES_PARAMS.forEach((k) => (satellite[k] = parseFloat(params[k])))
 
-		// Normalize
-		const n = (satellite.meanMotion * 2 * Math.PI) / DAY_SECONDS
-		satellite.eccentricity = satellite.eccentricity
-		satellite.semiMajorAxis = Math.cbrt(EARTH_MU / (n * n)) / EARTH_RADIUS
+		// Convert revolution per day to radiant per seconds
+		// Source: https://space.stackexchange.com/a/18291
+		const meanMotion = (satellite.meanMotion * 2 * Math.PI) / DAY_SECONDS
+
+		// Retrieve the semi major axis normalized (based on the same source as before)
+		satellite.semiMajorAxis = Math.cbrt(EARTH_MU / meanMotion ** 2) / EARTH_RADIUS
+
+		// Convert degrees to radiants
 		satellite.inclination = satellite.inclination * DEG_TO_RAD
 		satellite.raan = satellite.raan * DEG_TO_RAD
 		satellite.argumentOfPerigee = satellite.argumentOfPerigee * DEG_TO_RAD
 		satellite.meanAnomaly = satellite.meanAnomaly * DEG_TO_RAD
-		satellite.meanMotion = n
+		satellite.meanMotion = meanMotion
 
 		return satellite
 	}
