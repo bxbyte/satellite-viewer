@@ -77,7 +77,7 @@ export class ExploreController {
         const url = this.#api.buildURL(params)
         this.#apiView.url = url
         this.#bookmarkView.isBookmarked = bookmarks.has(url)
-        this.#bookmarkView.isBookmarkable = this.#apiView.hasValidURL;
+        this.#bookmarkView.isBookmarkable = this.#apiView.hasValidParams;
     }
 
     /**
@@ -97,5 +97,8 @@ export class ExploreController {
             if (api.entrypoint.searchParams.has(k)) return
             this.#apiView.addParamField(this.#api.params, k, v)
         })
+        
+        this.#bookmarkView.isBookmarkable = this.#apiView.hasValidParams;
+        this.#bookmarkView.isBookmarked = bookmarks.has(url);
     }
 }

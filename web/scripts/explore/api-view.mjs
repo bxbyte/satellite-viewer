@@ -61,7 +61,7 @@ export class ApiView {
 		})
 	}
 
-	get hasValidURL() {
+	get hasValidParams() {
 		return this.#formEl.checkValidity()
 	}
 
