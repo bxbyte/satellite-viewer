@@ -13,7 +13,6 @@ import { load } from "./web/scripts/utils.mjs"
 /** API entrypoint */
 const entrypoint = new URL("https://celestrak.org/NORAD/elements/gp.php")
 entrypoint.searchParams.set("FORMAT", "2LE")
-entrypoint.searchParams.set("SPECIAL", "GPZ-PLUS")
 entrypoint.searchParams.set("GROUP", "ACTIVE")
 
 const satellites = Satellite.collectionFrom3LEs(await load(entrypoint)),

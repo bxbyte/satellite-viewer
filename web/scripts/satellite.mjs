@@ -1,6 +1,8 @@
 import { notNull } from "./utils.mjs"
 
-const DEG_TO_RAD = Math.PI / 180,
+const 
+	CURRENT_CENTURY = Math.floor(new Date().getFullYear() / 100),
+	DEG_TO_RAD = Math.PI / 180,
 	DAY_SECONDS = 86_400,
 	/** Earth standard gravitational parameter (https://en.wikipedia.org/wiki/Standard_gravitational_parameter) */
 	EARTH_MU = 398_600.4418,
@@ -9,12 +11,14 @@ const DEG_TO_RAD = Math.PI / 180,
 
 const /** Regexp to match some second line parameters of 2LE */
 	MATCH_2LE_L2 =
-		/2\s+\d{5}\s+(?<inclination>.{1,8})\s+(?<raan>.{1,8})\s+(?<eccentricity>\d{1,7})\s+(?<argumentOfPerigee>.{1,8})\s+(?<meanAnomaly>.{1,8})\s+(?<meanMotion>.{1,11}).{1,5}\d{1}/gm,
+	/2\s+\d{5}\s+(?<inclination>.{1,8})\s+(?<raan>.{1,8})\s+(?<eccentricity>\d{1,7})\s+(?<argumentOfPerigee>.{1,8})\s+(?<meanAnomaly>.{1,8})\s+(?<meanMotion>.{1,11}).{1,5}\d{1}/gm,
+	/** Regexp to match some 1st line parameters of 2LE */
+	MATCH_2LE_L1 = /1\s.{16}(?<year>\d{2})(?<day>.{11}).*\d{1}/gm,
 	/** Regexp to match name and 2nd line of 3LE */
-	MATCH_3LE = new RegExp(String.raw`(?<name>^.*$)(?:\s+1.*\s+${MATCH_2LE_L2.source})`, "gm")
+	MATCH_3LE = new RegExp(String.raw`(?<name>^.*$)(?:\s+${MATCH_2LE_L1.source}\s+${MATCH_2LE_L2.source})`, "gm")
 
-/** 2LE parameters used to compute ECI coordinates */
-export const SATELLITES_PARAMS = [
+/** Orbitals elements from the 2LE */
+export const ORBITS_ELEMENTS = [
 	"eccentricity",
 	"semiMajorAxis",
 	"inclination",
@@ -22,6 +26,12 @@ export const SATELLITES_PARAMS = [
 	"argumentOfPerigee",
 	"meanAnomaly",
 	"meanMotion",
+]
+
+/** Satellites parameters used to compute ECI coordinates */
+export const SATELLITES_PARAMS = [
+	...ORBITS_ELEMENTS,
+	"timeOffset"
 ]
 
 export class Satellite {
@@ -33,22 +43,34 @@ export class Satellite {
 	argumentOfPerigee = 0
 	meanAnomaly = 0
 	meanMotion = 0
+	timeOffset = 0
 
 	/**
 	 * Create satellite from 2LE matched params
-	 * @param {Record<typeof SATELLITES_PARAMS, string>} params
+	 * @param {Record<typeof SATELLITES_PARAMS, string> & { year: string, day: string }} params
 	 */
-	static #from2LEStringObject(params) {
+	static #from2LEStringObject({year, day, ...orbitElements}) {
 		const satellite = new Satellite()
-		// Reformat eccentricity to float string as it's only the decimal part
-		params.eccentricity = "." + params.eccentricity
 
-		// Convert orbitals elements from string to float
-		SATELLITES_PARAMS.forEach((k) => (satellite[k] = parseFloat(params[k])))
+		// Calculate precise date when orbitals elements where calculated 
+		const calcDate = new Date(`${CURRENT_CENTURY}${year}`) // Convert 2 digits year to year
+		calcDate.setTime(calcDate.getTime()
+			+ Math.floor(parseFloat(day) * DAY_SECONDS * 1e3) // Convert decimal day to millisecond 
+		)
+
+		// Calc offset from now in seconds
+		satellite.timeOffset = (Date.now() - calcDate.getTime()) / 1e3
+
+		// Reformat eccentricity to float string as it's only the decimal part
+		orbitElements.eccentricity = "." + orbitElements.eccentricity
+
+		// Convert and set orbitals elements from string to float
+		ORBITS_ELEMENTS.forEach((k) => (satellite[k] = parseFloat(orbitElements[k])))
 
 		// Convert revolution per day to radiant per seconds
 		// Source: https://space.stackexchange.com/a/18291
 		const meanMotion = (satellite.meanMotion * 2 * Math.PI) / DAY_SECONDS
+		satellite.meanMotion = meanMotion
 
 		// Retrieve the semi major axis normalized (based on the same source as before)
 		satellite.semiMajorAxis = Math.cbrt(EARTH_MU / meanMotion ** 2) / EARTH_RADIUS
@@ -58,7 +80,6 @@ export class Satellite {
 		satellite.raan = satellite.raan * DEG_TO_RAD
 		satellite.argumentOfPerigee = satellite.argumentOfPerigee * DEG_TO_RAD
 		satellite.meanAnomaly = satellite.meanAnomaly * DEG_TO_RAD
-		satellite.meanMotion = meanMotion
 
 		return satellite
 	}
@@ -103,9 +124,3 @@ export class Satellite {
 		return satellites
 	}
 }
-
-/** Pre-transformed default satellites (see /celestrak-pipe.mjs) */
-export const defaultSatellites = await (async () => {
-	const res = await fetch(new URL("../data/satellites.bin", import.meta.url))
-	return Satellite.collectionFromBuffer(await res.arrayBuffer())
-})()

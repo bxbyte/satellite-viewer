@@ -19,6 +19,7 @@ in float raan;
 in float argumentOfPerigee;
 in float meanAnomaly;
 in float meanMotion;
+in float timeOffset;
 
 // Satellites color
 in vec3 color;
@@ -30,7 +31,7 @@ out vec2 ptPosition;
 /** Implementation of the TLE to ECI conversion */
 vec3 computeECI() {
   // Step 1 is skipped as it's prepare before
-  float M = meanAnomaly + meanMotion * ctrl.time;
+  float M = meanAnomaly + meanMotion * (timeOffset + ctrl.time);
 
   // Step 2: Solve Kepler's equation M = E - eccentricity * sin(E)
   // with the Newton-Raphson method
