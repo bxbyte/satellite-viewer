@@ -37,7 +37,7 @@ This project was made in full vanilla JS and should be compatible with most mode
         │   ├── satellite-list-view.mjs     # View listing satellite (for results)
         │   └── satellite-scene-view        # View displaying satellites in 3d
         │       ├── ...
-        │       ├── scene-view.mjs          # View scene renderer
+        │       ├── scene-view.mjs          # View 3d scene renderer
         │       ├── scene-gestures.mjs      # Handler for view gestures (zoom, rotate, ...)
         │       ├── matrix.mjs              # Matrix implementations (for 3d, ...)
         │       ├── shader-program.mjs      # Shader assembler (compilation, ...)
@@ -92,8 +92,8 @@ graph TD;
 
 ### Note on `celestrak-pipe.mjs` & `web/data/satellites.bin`
 
-The script `celestrak-pipe.mjs` is run on each deploy with Github Page to get and transform TLEs into binary in `data/satellites.bin`, that file being used to load and display default satellites.
+The script `celestrak-pipe.mjs` is run every time the deploy workflow run on Github Action to get some TLEs from Celestrak and pre-transform them into binary in `data/satellites.bin`, that file being used to display the default satellites.
 
 # TLE Data to ECI
 
-The orbital elements (from TLE data) to Earth Centered Inertial (ECI) coordinates conversion done here is an implementation with some tweaks of [the method described in this paper from M. René Schwarz](./docs/Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf), found on the internet.
+The coordinates conversion from orbital elements (itself from TLE data) to Earth Centered Inertial (ECI) done here is an implementation (with some tweaks) of [the method described in this paper from M. René Schwarz](./docs/Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf), found on the internet.

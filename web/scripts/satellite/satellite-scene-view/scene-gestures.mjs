@@ -3,40 +3,38 @@ import { M4x4 } from "./matrix.mjs"
 export class SceneControls {
 	/**
 	 * Define scene control parameters, a.k.a projection, movements, ...
-	 * @param {import("./scene-view.mjs").scene} scene Parent scene
+	 * @param {import("./scene-view.mjs").SatelliteSceneView} sceneView Parent scene
 	 */
-	constructor(SatelliteSceneView) {
-		this.SatelliteSceneView = SatelliteSceneView
+	constructor(sceneView) {
+		this.sceneView = sceneView
 
-		/** @type {{x: number, y: number}?} */
-		this.prevPointer = null
-
-		this.setTime = this.SatelliteSceneView.shader.getUniformSetter("ctrl.time", "1f")
-		this.setResolution = this.SatelliteSceneView.shader.getUniformSetter("ctrl.resolution", "2f")
+		this.setTime = this.sceneView.shader.getUniformSetter("ctrl.time", "1f")
+		this.setResolution = this.sceneView.shader.getUniformSetter("ctrl.resolution", "2f")
 
 		this.projection = M4x4.projection(
 			40,
-			this.SatelliteSceneView.cvs.width / this.SatelliteSceneView.cvs.height,
+			this.sceneView.cvs.width / this.sceneView.cvs.height,
 			0,
 			100
 		)
-		const setProjection = this.SatelliteSceneView.shader.getUniformSetter("ctrl.projection", "Matrix4fv")
+		const setProjection = this.sceneView.shader.getUniformSetter("ctrl.projection", "Matrix4fv")
 		this.updateProjection = () => setProjection(false, this.projection)
 
 		this.view = M4x4.identity()
-		const setView = this.SatelliteSceneView.shader.getUniformSetter("ctrl.view", "Matrix4fv")
+		const setView = this.sceneView.shader.getUniformSetter("ctrl.view", "Matrix4fv")
 		this.updateView = () => setView(false, this.view)
 
 		this.motion = M4x4.identity()
-		const setMotion = this.SatelliteSceneView.shader.getUniformSetter("ctrl.motion", "Matrix4fv")
+		const setMotion = this.sceneView.shader.getUniformSetter("ctrl.motion", "Matrix4fv")
 		this.updateMotion = () => setMotion(false, this.motion)
 
+		this.updAspectRatio()
+		this.resetCursor()
+		
 		this.#setAspectRatioAutoUpdate()
 		this.#setZoomControl()
 		this.#setRotateControl()
 
-		this.updAspectRatio()
-		this.resetCursor()
 	}
 
 	/**
@@ -44,7 +42,7 @@ export class SceneControls {
 	 * @param {string} cursor Cursor type
 	 */
 	set cursor(cursor) {
-		this.SatelliteSceneView.cvs.style.cursor = cursor
+		this.sceneView.cvs.style.cursor = cursor
 	}
 
 	/** Reset canvas cursor */
@@ -54,23 +52,23 @@ export class SceneControls {
 
 	/** Update canvas aspect ratio */
 	updAspectRatio() {
-		this.SatelliteSceneView.cvs.width = Math.floor(this.SatelliteSceneView.cvs.clientWidth)
-		this.SatelliteSceneView.cvs.height = Math.floor(this.SatelliteSceneView.cvs.clientHeight)
-		this.SatelliteSceneView.gl.viewport(0, 0, this.SatelliteSceneView.cvs.width, this.SatelliteSceneView.cvs.height)
-		this.setResolution(this.SatelliteSceneView.cvs.width, this.SatelliteSceneView.cvs.height)
-		this.projection.setAspectRatio(this.SatelliteSceneView.cvs.width / this.SatelliteSceneView.cvs.height)
+		this.sceneView.cvs.width = Math.floor(this.sceneView.cvs.clientWidth)
+		this.sceneView.cvs.height = Math.floor(this.sceneView.cvs.clientHeight)
+		this.sceneView.gl.viewport(0, 0, this.sceneView.cvs.width, this.sceneView.cvs.height)
+		this.setResolution(this.sceneView.cvs.width, this.sceneView.cvs.height)
+		this.projection.setAspectRatio(this.sceneView.cvs.width / this.sceneView.cvs.height)
 		this.updateProjection()
 	}
 
 	/** Auto set aspect ratio on canvas size change */
 	#setAspectRatioAutoUpdate() {
-		new ResizeObserver(this.updAspectRatio.bind(this)).observe(this.SatelliteSceneView.cvs)
+		new ResizeObserver(this.updAspectRatio.bind(this)).observe(this.sceneView.cvs)
 	}
 
 	/** Set zoom control on wheel */
 	#setZoomControl() {
 		let scrollEndId = 0 // Timeout id resetting on wheel event to detect wheel end
-		this.SatelliteSceneView.cvs.addEventListener("wheel", (ev) => {
+		this.sceneView.cvs.addEventListener("wheel", (ev) => {
 			this.view[14] += ev.deltaY * 1e-1
 			this.updateView()
 			this.cursor = ev.deltaY > 0 ? "zoom-in" : "zoom-out"
@@ -81,27 +79,30 @@ export class SceneControls {
 
 	/** Set rotate control on grab */
 	#setRotateControl() {
+		/** @type {{x: number, y: number}?} */
+		let prevPointer = null
+	
 		// Init previous pointer to the point where the user start to click
-		this.SatelliteSceneView.cvs.addEventListener("pointerdown", (ev) => {
-			this.prevPointer = { x: ev.pageX, y: ev.pageY }
+		this.sceneView.cvs.addEventListener("pointerdown", (ev) => {
+			prevPointer = { x: ev.pageX, y: ev.pageY }
 			this.cursor = "grabbing"
 		})
 		// Reset pointer when user stop clicking
 		const resetPointer = () => {
-			this.prevPointer = null
+			prevPointer = null
 			this.resetCursor()
 		}
-		this.SatelliteSceneView.cvs.addEventListener("pointerup", resetPointer)
-		this.SatelliteSceneView.cvs.addEventListener("pointerleave", resetPointer)
+		this.sceneView.cvs.addEventListener("pointerup", resetPointer)
+		this.sceneView.cvs.addEventListener("pointerleave", resetPointer)
 		// Rotate on user move with pointer down
-		this.SatelliteSceneView.cvs.addEventListener("pointermove", (ev) => {
-			if (!this.prevPointer) return
-			const now = { x: ev.pageX, y: ev.pageY }
-			const delta = { x: now.x - this.prevPointer.x, y: now.y - this.prevPointer.y }
-			this.view.rotateY(delta.x * 1e-2)
-			this.view.rotateX(delta.y * 1e-2)
+		this.sceneView.cvs.addEventListener("pointermove", (ev) => {
+			if (!prevPointer) return
+			const currentPtr = { x: ev.pageX, y: ev.pageY }
+			const deltaPtr = { x: currentPtr.x - prevPointer.x, y: currentPtr.y - prevPointer.y }
+			this.view.rotateY(deltaPtr.x * 1e-2)
+			this.view.rotateX(deltaPtr.y * 1e-2)
 			this.updateView()
-			this.prevPointer = now
+			prevPointer = currentPtr
 		})
 	}
 }
