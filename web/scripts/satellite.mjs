@@ -13,9 +13,11 @@ const /** Regexp to match some second line parameters of 2LE */
 	MATCH_2LE_L2 =
 	/2\s+\d{5}\s+(?<inclination>.{1,8})\s+(?<raan>.{1,8})\s+(?<eccentricity>\d{1,7})\s+(?<argumentOfPerigee>.{1,8})\s+(?<meanAnomaly>.{1,8})\s+(?<meanMotion>.{1,11}).{1,5}\d{1}/gm,
 	/** Regexp to match some 1st line parameters of 2LE */
-	MATCH_2LE_L1 = /1\s.{16}(?<year>\d{2})(?<day>.{11}).*\d{1}/gm,
-	/** Regexp to match name and 2nd line of 3LE */
-	MATCH_3LE = new RegExp(String.raw`(?<name>^.*$)(?:\s+${MATCH_2LE_L1.source}\s+${MATCH_2LE_L2.source})`, "gm")
+	MATCH_2LE_L1 = /1\s.{16}(?<year>\d{2})(?<day>.{12}).*\d{1}/gm,
+	/** Regexp to match a 2LE */
+	MATCH_2LE = new RegExp(String.raw`\s*${MATCH_2LE_L1.source}\s*${MATCH_2LE_L2.source}`, "gm"),
+	/** Regexp to match a 3LE (name + 2LE) */
+	MATCH_3LE = new RegExp(String.raw`(?<name>^.*$)${MATCH_2LE.source}`, "gm")
 
 /** Orbitals elements from the 2LE */
 export const ORBITS_ELEMENTS = [
@@ -55,7 +57,7 @@ export class Satellite {
 		// Calculate precise date when orbitals elements where calculated 
 		const calcDate = new Date(`${CURRENT_CENTURY}${year}`) // Convert 2 digits year to year
 		calcDate.setTime(calcDate.getTime()
-			+ Math.floor(parseFloat(day) * DAY_SECONDS * 1e3) // Convert decimal day to millisecond 
+			+ Math.floor((parseFloat(day) - 1) * DAY_SECONDS * 1e3) // Convert decimal day to millisecond 
 		)
 
 		// Calc offset from now in seconds
@@ -90,7 +92,7 @@ export class Satellite {
 	 * @returns {Satellite}
 	 */
 	static from2LE(tle) {
-		return Satellite.#from2LEStringObject(notNull(new RegExp(MATCH_2LE_L2).exec(tle).groups, "No TLE found"))
+		return Satellite.#from2LEStringObject(notNull(new RegExp(MATCH_2LE).exec(tle).groups, "No TLE found"))
 	}
 
 	/**

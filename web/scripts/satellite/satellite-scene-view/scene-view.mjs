@@ -71,15 +71,14 @@ export class SatelliteSceneView {
 
 		// Set render function
 		this.render((time, dt) => {
-			this.gl.enable(this.gl.DEPTH_TEST)
-			this.gl.depthFunc(this.gl.LEQUAL)
-
 			this.gl.clearColor(0, 0, 0, 0)
 			this.gl.clearDepth(1)
 			this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
 
 			this.controls.setTime(time)
 
+			this.gl.enable(this.gl.DEPTH_TEST)
+			this.gl.depthFunc(this.gl.LEQUAL)
 			this.gl.drawArrays(this.gl.POINTS, 0, this.#satellites.length)
 		})
 	}

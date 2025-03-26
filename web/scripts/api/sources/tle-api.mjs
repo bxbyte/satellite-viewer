@@ -41,8 +41,8 @@ export const TleApi = new API({
 		},
 	],
 	load: async (res) =>
-		(await res.json()).member.map(({ line2, name }) => {
-			const satellite = Satellite.from2LE(line2)
+		(await res.json()).member.map(({ line1, line2, name }) => {
+			const satellite = Satellite.from2LE(line1 + line2)
 			satellite.name = name
 			return satellite
 		}),
