@@ -1,6 +1,6 @@
 import { getElement, notNull, load } from "../../utils.mjs"
 import { SATELLITES_PARAMS } from "../../satellite.mjs"
-import { SceneControls } from "./scene-gestures.mjs"
+import { SceneControls } from "./scene-controls.mjs"
 import { ShaderProgram } from "./shader-program.mjs"
 
 /** WebGL fragment and vertex shaders code */
@@ -13,7 +13,7 @@ export class SatelliteSceneView {
 	 * Current satellites
 	 * @type {import("../satellite.mjs").Satellite[]}
 	 */
-	#satellites
+	#satellites = []
 
 	/**
 	 * Satellites color buffer
@@ -21,65 +21,64 @@ export class SatelliteSceneView {
 	 */
 	#satellitesColors
 
+	/** Scene canvas */
+	#cvs = getElement("canvas")
+
+	/** Rendering context */
+	#gl = notNull(
+		this.#cvs.getContext("webgl2", {
+			premultipliedAlpha: false, // Use alpha
+			powerPreference: "high-performance",
+		}),
+		"Your browser doesn't support the Webgl2 API"
+	)
+
+	/** Shader program */
+	#shader = new ShaderProgram(this.#gl, ...shadersCode)
+
+	/** Scene controls */
+	#controls = new SceneControls(this.#cvs, this.#shader)
+
 	constructor() {
-		this.#satellites = []
+		this.#shader.use()
 
-		/** scene canvas */
-		this.cvs = getElement("canvas")
-
-		/** Rendering context */
-		this.gl = notNull(
-			this.cvs.getContext("webgl2", {
-				premultipliedAlpha: false, // Use alpha
-				powerPreference: "high-performance",
-			}),
-			"Your browser doesn't support the Webgl2 API"
-		)
-
-		/** Shader program */
-		this.shader = new ShaderProgram(this.gl, ...shadersCode)
-		this.shader.use()
-
-		/** scene controls */
-		this.controls = new SceneControls(this)
-		this.controls.view[14] = this.controls.view[14] - 15 // zoom
-		this.controls.updateView()
-		this.controls.motion.rotateX(Math.PI / 4)
-		this.controls.motion.rotateY(Math.PI / 4)
-		this.controls.updateMotion()
+		this.#controls.zoom = -15
+		this.#controls.motion.rotateX(Math.PI / 4)
+		this.#controls.motion.rotateY(3 * Math.PI / 4)
+		this.#controls.updateMotion()
 
 		const updateSatellitesParamsBuffers = SATELLITES_PARAMS.map((paramName) => {
-			const attrLocation = this.shader.getBuffer(paramName, 1, this.gl.FLOAT, false, 0, 0)
+			const attrLocation = this.#shader.getBuffer(paramName, 1, this.#gl.FLOAT, false, 0, 0)
 			return () => {
-				this.gl.bindBuffer(this.gl.ARRAY_BUFFER, attrLocation)
-				this.gl.bufferData(
-					this.gl.ARRAY_BUFFER,
+				this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, attrLocation)
+				this.#gl.bufferData(
+					this.#gl.ARRAY_BUFFER,
 					new Float32Array(this.#satellites.flatMap(({ [paramName]: v }) => v)),
-					this.gl.STATIC_DRAW
+					this.#gl.STATIC_DRAW
 				)
 			}
 		})
 		/** Update satellites params buffers (need to set satellites before) */
 		this.updateSatellitesParams = () => updateSatellitesParamsBuffers.forEach((b) => b())
 
-		const colorLocation = this.shader.getBuffer("color", 3, this.gl.FLOAT, false, 0, 0)
+		const colorLocation = this.#shader.getBuffer("color", 3, this.#gl.FLOAT, false, 0, 0)
 		/** Update satellites color buffer (need to set satellites before) */
 		this.updateColors = () => {
-			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorLocation)
-			this.gl.bufferData(this.gl.ARRAY_BUFFER, this.#satellitesColors, this.gl.STATIC_DRAW)
+			this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, colorLocation)
+			this.#gl.bufferData(this.#gl.ARRAY_BUFFER, this.#satellitesColors, this.#gl.STATIC_DRAW)
 		}
 
 		// Set render function
 		this.render((time, dt) => {
-			this.gl.clearColor(0, 0, 0, 0)
-			this.gl.clearDepth(1)
-			this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
+			this.#gl.clearColor(0, 0, 0, 0)
+			this.#gl.clearDepth(1)
+			this.#gl.clear(this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT)
 
-			this.controls.setTime(time)
+			this.#controls.setTime(time)
 
-			this.gl.enable(this.gl.DEPTH_TEST)
-			this.gl.depthFunc(this.gl.LEQUAL)
-			this.gl.drawArrays(this.gl.POINTS, 0, this.#satellites.length)
+			this.#gl.enable(this.#gl.DEPTH_TEST)
+			this.#gl.depthFunc(this.#gl.LEQUAL)
+			this.#gl.drawArrays(this.#gl.POINTS, 0, this.#satellites.length)
 		})
 	}
 
