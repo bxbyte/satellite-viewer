@@ -48,7 +48,10 @@ export class SearchController {
 			this.#bookmarkView.showDialog([...bookmarks.bookmarks].map((v) => new URL(v)))
 		}
 
-		this.#bookmarkView.onSelectBookmark = this.updateFromURL.bind(this)
+		this.#bookmarkView.onSelectBookmark = (url) => {
+			this.updateFromURL(url)
+			setTimeout(() => this.#apiView.setFocus(), 100) // Workaround to set focus after dialog close
+		}
 
 		this.#bookmarkView.onRemoveBookmark = (url) => {
 			bookmarks.delete(url)

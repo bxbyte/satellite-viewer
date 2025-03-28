@@ -5,6 +5,9 @@ export class ApiView {
 	/** Form with API entry */
 	#formEl = getElement("form[role=search]")
 
+	/** Form submit button */
+	#submitEl = getElement("[type=submit]", this.#formEl)
+
 	/** API url "input" */
 	#urlEl = getElement("input[name=url]", this.#formEl)
 
@@ -24,6 +27,11 @@ export class ApiView {
 	constructor(apiNames) {
 		// Set all APIs option
 		this.#apiNameEl.append(...apiNames.map((v) => new Option(v, v)))
+	}
+
+	setFocus() {
+		this.#submitEl.focus()
+		console.log(this.#submitEl)
 	}
 
 	/** @param {boolean} isLoading */
