@@ -3,7 +3,7 @@ import { createEl, getElement } from "../utils.mjs"
 
 export class ApiView {
 	/** Form with API entry */
-	#formEl = getElement("form#search")
+	#formEl = getElement("form[role=search]")
 
 	/** API url "input" */
 	#urlEl = getElement("input[name=url]", this.#formEl)

@@ -38,7 +38,7 @@ This project was made in full vanilla JS and should be compatible with most mode
         │   └── satellite-scene-view        # View displaying satellites in 3d
         │       ├── ...
         │       ├── scene-view.mjs          # View 3d scene renderer
-        │       ├── scene-gestures.mjs      # Handler for view gestures (zoom, rotate, ...)
+        │       ├── scene-controls.mjs      # Handler for view controls (zoom, rotate, ...)
         │       ├── matrix.mjs              # Matrix implementations (for 3d, ...)
         │       ├── shader-program.mjs      # Shader assembler (compilation, ...)
         │       └── shaders                 # Shader programs' code

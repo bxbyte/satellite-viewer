@@ -17,7 +17,7 @@ addEventListener("activate", (ev) => {
 	ev.waitUntil(clients.claim())
 	// Cache cleaning
 	ev.waitUntil(cleanCache())
-	setTimeout(cleanCache, MAX_CACHED_LIVE)
+	setInterval(cleanCache, MAX_CACHED_LIVE)
 })
 
 // Handle fetch request
